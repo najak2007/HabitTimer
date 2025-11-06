@@ -14,26 +14,33 @@ struct ContentView: View {
     private let endTime: Double = 10
     
     @State private var elapsedTime: Double = 0.0
+    @State private var isPomodoroTimer: Bool = false
     
     // UI Config
     private let themeColor: Color = Color(red: 252/255, green: 95/255, blue: 163/255)
     private let circlePadding: CGFloat = 30
     
     var body: some View {
-        VStack {
-            Circle()
-                .strokeBorder(lineWidth: 24)
-                .overlay {
-                    Circle()
-                        .trim(from: 0.0, to: elapsedTime/endTime)
-                        .stroke(themeColor, style: StrokeStyle(lineWidth: 24.0, lineCap: .round, lineJoin: .round))
-                        .rotationEffect(Angle(degrees: 270))
-                        .animation(.easeInOut(duration: 1.0), value: elapsedTime)
-                        .padding(12)
-                }
-                .padding(circlePadding)
-
-            
+        NavigationView {
+            VStack {
+                Circle()
+                    .strokeBorder(lineWidth: 24)
+                    .overlay {
+                        Circle()
+                            .trim(from: 0.0, to: elapsedTime/endTime)
+                            .stroke(themeColor, style: StrokeStyle(lineWidth: 24.0, lineCap: .round, lineJoin: .round))
+                            .rotationEffect(Angle(degrees: 270))
+                            .animation(.easeInOut(duration: 1.0), value: elapsedTime)
+                            .padding(12)
+                    }
+                    .padding(circlePadding)
+                
+                Button(action: {
+                    self.isPomodoroTimer.toggle()
+                }, label: {
+                    Text("Pomodoro View")
+                })
+            }
         }
         .onReceive(timer) { _ in
             let elapsedTime = Date().timeIntervalSinceReferenceDate - startTime.timeIntervalSinceReferenceDate
@@ -45,6 +52,11 @@ struct ContentView: View {
         }
         .onDisappear {
             timer.upstream.connect().cancel()
+        }
+        .fullScreenCover(isPresented: $isPomodoroTimer, onDismiss: {
+            
+        }) {
+            PomodoroView()
         }
     }
 }
