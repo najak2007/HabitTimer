@@ -10,9 +10,22 @@
 		7A9FC3E62EBA1AE90000E9E2 /* HabitTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HabitTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		897D84DF2EBC6CF300081196 /* Exceptions for "HabitTimer" folder in "HabitTimer" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7A9FC3E52EBA1AE90000E9E2 /* HabitTimer */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7A9FC3E82EBA1AE90000E9E2 /* HabitTimer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				897D84DF2EBC6CF300081196 /* Exceptions for "HabitTimer" folder in "HabitTimer" target */,
+			);
 			path = HabitTimer;
 			sourceTree = "<group>";
 		};
@@ -258,6 +271,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GFSSMD5582;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HabitTimer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -294,6 +308,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GFSSMD5582;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HabitTimer/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
