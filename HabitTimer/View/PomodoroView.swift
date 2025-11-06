@@ -46,18 +46,8 @@ struct PomodoroView: View {
                 GeometryReader { geometryProxy in
                     ZStack(alignment: .center) {
                         Circle()
- //                           .strokeBorder(lineWidth: 2)
                             .foregroundColor(self.color)
-                            .overlay {
-                                Circle()
-                                    .trim(from: 0.0, to: elapsedTime/Config.POMODORO_TIME_MINUTE)
-                                    .stroke(themeColor, style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
-                                    .rotationEffect(Angle(degrees: 270))
-                                    .animation(.easeInOut(duration: self.elapsedTime == 0 ? 0.0 : 1.0), value: elapsedTime)
-                                    .padding(2)
-                                    
-                            }
-                        
+
                         Path { path in
                             let size = geometryProxy.size
                             let center = CGPoint(x: size.width / 2.0,
@@ -76,6 +66,18 @@ struct PomodoroView: View {
                         .frame(width: geometryProxy.size.width,
                                height: geometryProxy.size.height,
                                alignment: .center)
+                        Circle()
+                            .strokeBorder(lineWidth: 2)
+                            .foregroundColor(self.color)
+                            .overlay {
+                                Circle()
+                                    .trim(from: 0.0, to: elapsedTime/Config.POMODORO_TIME_MINUTE)
+                                    .stroke(themeColor, style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
+                                    .rotationEffect(Angle(degrees: 270))
+                                    .animation(.easeInOut(duration: self.elapsedTime == 0 ? 0.0 : 1.0), value: elapsedTime)
+                                    .padding(2)
+                                    
+                            }
                     }
                 }
             }
