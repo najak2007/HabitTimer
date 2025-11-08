@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import Combine
+
+var minutePassed = PassthroughSubject<Bool, Never>()
 
 enum PomodoroState: Decodable, Encodable {
     case 초기화
