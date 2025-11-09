@@ -24,7 +24,7 @@ struct PomodoroView: View {
     @State private var startPercent: CGFloat = 0
     @State private var endPercent: CGFloat = 360
     @State private var color: Color = .red
-    @State private var backgroundColor: Color = .black
+    @State private var backgroundColor: Color = Color("CircleTimeBackground")
     @State private var elapsedTime: Double = 0.0
     @State private var selectedMinute: Double = Config.POMODORO_DEFAULT_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
@@ -75,11 +75,12 @@ struct PomodoroView: View {
                             .strokeBorder(self.color, lineWidth: 2)
                             .overlay {
                                 Circle()
-                                    .trim(from: 0.0, to: elapsedTime/Config.POMODORO_TIME_MINUTE)
+                                    .trim(from: 0.0, to: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE)
                                     .stroke(themeColor, style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
                                     .rotationEffect(Angle(degrees: 270))
                                     .animation(.easeInOut(duration: self.elapsedTime == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
                                     .padding(2)
+                                    
                                 
                             }
                     }
@@ -101,6 +102,15 @@ struct PomodoroView: View {
                     })
                     .padding(.bottom, 50)
                 }
+                
+                Text("TimerManager.timeRemaining = \(timerManager.timeRemaining)")
+                    .padding()
+            }
+        }
+        .onReceive(minutePassed) { value in
+            if value {
+                self.selectedMinute = self.selectedMinute - 1
+                getTimerForAngle()
             }
         }
 //        .onReceive(secondTimer) { _ in

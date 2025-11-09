@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 class TimerManager: ObservableObject {
-    @Published var timeRemaining: Double = Config.POMODORO_TIME_MINUTE
+    @Published var timeRemaining: Double = 0
     @Published var isPaused: Bool = true
     private var timer: Timer?
     
@@ -18,11 +18,10 @@ class TimerManager: ObservableObject {
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
                 
-                if self.timeRemaining > 0 {
-                    self.timeRemaining -= 1
-                } else {
-                    self.timer?.invalidate()
-                    self.timer = nil
+                self.timeRemaining += 1
+                if self.timeRemaining >= Config.POMODORO_TIME_MINUTE {
+                    self.timeRemaining = 0
+                    minutePassed.send(true)     // Void로 하면 .send() 로 해도 된다.
                 }
             }
             isPaused = false
