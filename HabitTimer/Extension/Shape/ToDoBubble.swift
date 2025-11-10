@@ -1,0 +1,88 @@
+//
+//  ToDoBubble.swift
+//  HabitTimer
+//
+//  Created by najak on 11/10/25.
+//
+
+import SwiftUI
+import Foundation
+
+struct ToDoBubble: Shape {
+    func path(in rect: CGRect) -> Path {
+        let path = Path { path in
+            let cornerRadius: Double = 10
+            let tailWidth: Double = 8
+            let tailHeight = cornerRadius
+            let bubbleWidth = rect.width - tailWidth
+
+            // these required a little geometry to find the midpoint of an arc,
+            // the formula also requires that the angle be in radians (not degrees) which is why
+            // we are using pi / 4 (radians) in the forumula below (which is equivalent to 45 degrees)
+            let tailEndpointX = (bubbleWidth - cornerRadius) + cornerRadius * cos(.pi / 4)
+            let tailEndpointY = (rect.height - cornerRadius) + cornerRadius * sin(.pi / 4)
+            
+            path.move(to: CGPoint(x: cornerRadius, y: rect.minY))
+            path.addLine(to: CGPoint(x: bubbleWidth - cornerRadius, y: rect.minY))
+            
+            // Top-right corner
+            path.addArc(
+                center: CGPoint(x: bubbleWidth - cornerRadius, y: cornerRadius),
+                radius: cornerRadius,
+                startAngle: Angle(degrees: -90),
+                endAngle: Angle(degrees: 0),
+                clockwise: false
+            )
+            
+            path.addLine(to: CGPoint(x: bubbleWidth, y: cornerRadius))
+            path.addLine(to: CGPoint(x: bubbleWidth, y: rect.height - cornerRadius))
+            
+            // Tail
+            path.addQuadCurve(
+                to: CGPoint(x: rect.width, y: rect.height),
+                control: CGPoint(x: bubbleWidth, y: rect.height - (tailHeight / 2))
+            )
+            path.addQuadCurve(
+                to: CGPoint(x: tailEndpointX, y: tailEndpointY),
+                control: CGPoint(x: bubbleWidth, y: rect.height)
+            )
+            
+            // Bottom-right corner
+            path.addArc(
+                center: CGPoint(x: bubbleWidth - cornerRadius, y: rect.height - cornerRadius),
+                radius: cornerRadius,
+                startAngle: Angle(degrees: 45),
+                endAngle: Angle(degrees: 90),
+                clockwise: false
+            )
+            
+            path.addLine(to: CGPoint(x: bubbleWidth - cornerRadius - tailWidth, y: rect.height))
+            path.addLine(to: CGPoint(x: rect.minX + cornerRadius, y: rect.height))
+            
+            // Bottom-left corner
+            path.addArc(
+                center: CGPoint(x: cornerRadius, y: rect.height - cornerRadius),
+                radius: cornerRadius,
+                startAngle: Angle(degrees: 90),
+                endAngle: Angle(degrees: 180),
+                clockwise: false
+            )
+            
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.height - cornerRadius))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + cornerRadius))
+            
+            // Top-left corner
+            path.addArc(
+                center: CGPoint(x: cornerRadius, y: cornerRadius),
+                radius: cornerRadius,
+                startAngle: Angle(degrees: 180),
+                endAngle: Angle(degrees: 270),
+                clockwise: false
+            )
+            
+            path.closeSubpath()
+        }
+        
+        return path
+    }
+}
