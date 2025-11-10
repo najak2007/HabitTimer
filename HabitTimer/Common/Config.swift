@@ -14,4 +14,8 @@ class Config {
     static let POMODORO_TIME_MINUTE: Double = 60
     static let POMODORO_TIME_DEFAULT_COUNT: Double = 25 * Config.POMODORO_TIME_MINUTE
     static let POMODORO_TIME_FULL_COUNT: Double = 60 * Config.POMODORO_TIME_MINUTE
+    
+    static let POMODORO_WORK_TIME_MINUTE: Double = 2 //25
+    
+    static let POMODORO_REST_TIME_MINUTE: Double = 5
 }
