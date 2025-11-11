@@ -18,7 +18,7 @@ struct TextWidthPreferenceKey: PreferenceKey {
 struct ToDoListRowView: View {
     
     let toDoListItem: ToDoListData
-    let isDateShow: Bool = false
+    var isDateShow: Bool = false
     
     @State private var textWidth: CGFloat = .zero
     
@@ -33,7 +33,6 @@ struct ToDoListRowView: View {
                     Text(toDoListItem.messageText)
                         .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
                         .font(.custom("GmarketSansTTFMedium", size: 18))
-//                        .frame(maxWidth : Config.TODO_BUBBLE_WIDTH, minHeight: 42)
                 }
                 if toDoListItem.isFromYou == false {
                     Spacer()
@@ -47,17 +46,19 @@ struct ToDoListRowView: View {
                 })
                 
                 HStack {
-                    if toDoListItem.isFromYou {
+                    if toDoListItem.isFromYou == true {
                         Spacer()
                     }
-                    Text(toDoListItem.messageText)
-                        .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
-                        .font(.custom("GmarketSansTTFMedium", size: 16))
-                        .frame(width: Config.TODO_BUBBLE_WIDTH)
+                    VStack(alignment: .trailing) {
+                        Text(toDoListItem.messageText)
+                            .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
+                            .font(.custom("GmarketSansTTFMedium", size: 18))
+                    }
                     if toDoListItem.isFromYou == false {
                         Spacer()
                     }
                 }
+                .padding(.horizontal, 0)
             }
         }
     }

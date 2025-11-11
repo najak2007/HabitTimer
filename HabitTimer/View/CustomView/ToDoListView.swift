@@ -17,13 +17,14 @@ struct ToDoListView: View {
     @State private var inputHeight: CGFloat = 42
     @State private var messageText: String = ""
     @State private var isFocused: Bool = false
+
     
     var body: some View {
 #if true
         VStack {
             List {
                 ForEach(toDoListViewModel.toDoList, id: \.id) { toDoListItem in
-                    ToDoListRowView(toDoListItem: toDoListItem)
+                    ToDoListRowView(toDoListItem: toDoListItem, isDateShow: toDoListViewModel.preToDoListData == nil ? true : toDoListViewModel.preToDoListData?.date.yyyyMMdd != toDoListItem.date.yyyyMMdd ? true : false)
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())
@@ -87,5 +88,18 @@ struct ToDoListView: View {
 
         }.padding()
 #endif
+    }
+    
+    func getShowDateState(currentToDoItem: ToDoListData) -> Bool {
+        guard let preToDoListItem = toDoListViewModel.preToDoListData else {
+            toDoListViewModel.preToDoListData = currentToDoItem
+            return true
+        }
+        
+        if preToDoListItem.date.yyyyMMdd != currentToDoItem.date.yyyyMMdd {
+            toDoListViewModel.preToDoListData = currentToDoItem
+            return true
+        }
+        return false
     }
 }
