@@ -18,4 +18,6 @@ class Config {
     static let POMODORO_WORK_TIME_MINUTE: Double = 2 //25
     
     static let POMODORO_REST_TIME_MINUTE: Double = 5
+    
+    static let TODO_BUBBLE_WIDTH: CGFloat = 300
 }
