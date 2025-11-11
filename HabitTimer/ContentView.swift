@@ -68,7 +68,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $isBubbleView, onDismiss: {
             
         }) {
-            ToDoListBubble()
+            ToDoListView()
         }
         
     }

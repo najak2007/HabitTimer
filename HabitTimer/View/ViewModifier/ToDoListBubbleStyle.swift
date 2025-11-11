@@ -12,7 +12,7 @@ struct ToDoListBubbleStyle: ViewModifier {
     let shouldSendInTheFuture: Bool
     var toDoListFillColor: Color {
         if shouldSendInTheFuture {
-            return Color.clear
+            return Color.white
         } else if isFromYou {
             return Color.blue
         } else {
@@ -35,13 +35,14 @@ struct ToDoListBubbleStyle: ViewModifier {
             .foregroundStyle(forgroundColor)
             .padding(.vertical, 8)
             .padding(.horizontal, 20)
+            .lineSpacing(5)
             .padding(isFromYou ? .trailing : .leading, 8)
             .background(
                 ToDoBubble()
                     .fill(toDoListFillColor)
-                    .stroke(Color.blue, style: StrokeStyle(dash: [shouldSendInTheFuture ? 6 : 0]))
                     .rotation3DEffect(isFromYou ? .degrees(0) : .degrees(180), axis: (x: 0, y: 1, z: 0))
             )
+            .padding(10)
     }
 }
 
@@ -68,7 +69,6 @@ extension View {
             .mask (
                 ToDoBubble()
                     .fill()
-                    .stroke(Color.blue, style: StrokeStyle(dash: [shouldSendInTheFuture ? 6 : 0]))
                     .rotation3DEffect(isFromYou ? .degrees(0) : .degrees(180), axis: (x: 0, y: 1, z: 0))
             )
     }
