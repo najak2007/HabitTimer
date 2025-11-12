@@ -13,7 +13,6 @@ class ToDoListViewModel: ObservableObject {
     private var realm: Realm?
     
     @Published var toDoList: [ToDoListData] = []
-    var preToDoListData: ToDoListData? = nil
     
     init() {
         realm = RealmManager.shared.realm

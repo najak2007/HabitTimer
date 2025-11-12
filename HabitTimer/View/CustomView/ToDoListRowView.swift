@@ -18,48 +18,24 @@ struct TextWidthPreferenceKey: PreferenceKey {
 struct ToDoListRowView: View {
     
     let toDoListItem: ToDoListData
-    var isDateShow: Bool = false
     
     @State private var textWidth: CGFloat = .zero
     
     
     var body: some View {
-        if isDateShow == false {
-            HStack {
-                if toDoListItem.isFromYou == true {
-                    Spacer()
-                }
-                VStack(alignment: .trailing) {
-                    Text(toDoListItem.messageText)
-                        .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
-                        .font(.custom("GmarketSansTTFMedium", size: 18))
-                }
-                if toDoListItem.isFromYou == false {
-                    Spacer()
-                }
+        HStack {
+            if toDoListItem.isFromYou == true {
+                Spacer()
             }
-            .padding(.horizontal, 0)
-        } else {
-            VStack(spacing: 5) {
-                RoundedButton(title: toDoListItem.date.yyyyMMddKR, fontSize: 14, backgroundColor: Color("1F2020").opacity(0.6), action: {
-                    
-                })
-                
-                HStack {
-                    if toDoListItem.isFromYou == true {
-                        Spacer()
-                    }
-                    VStack(alignment: .trailing) {
-                        Text(toDoListItem.messageText)
-                            .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
-                            .font(.custom("GmarketSansTTFMedium", size: 18))
-                    }
-                    if toDoListItem.isFromYou == false {
-                        Spacer()
-                    }
-                }
-                .padding(.horizontal, 0)
+            VStack(alignment: .trailing) {
+                Text(toDoListItem.messageText)
+                    .toDoListBubblesStyle(isFromYou: toDoListItem.isFromYou)
+                    .font(.custom("GmarketSansTTFMedium", size: 18))
+            }
+            if toDoListItem.isFromYou == false {
+                Spacer()
             }
         }
+        .padding(.horizontal, 0)
     }
 }
