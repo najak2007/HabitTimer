@@ -11,7 +11,8 @@ import SwiftUI
 struct HabitTimerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+            PostitListView()
         }
     }
 }

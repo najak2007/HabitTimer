@@ -22,17 +22,49 @@ struct ToDoListView: View {
     var body: some View {
 #if true
         VStack {
-            List {
-                ForEach(toDoListViewModel.toDoList, id: \.id) { toDoListItem in
-                    ToDoListRowView(toDoListItem: toDoListItem, isDateShow: toDoListViewModel.preToDoListData == nil ? true : toDoListViewModel.preToDoListData?.date.yyyyMMdd != toDoListItem.date.yyyyMMdd ? true : false)
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets())
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(toDoListViewModel.toDoList.indices, id: \.self) { index in
+                        if getShowDateState(index: index) == true {
+                            HStack {
+                                Spacer()
+                                Text(toDoListViewModel.toDoList[index].date.yyyyMMddKR)
+                                    .font(.custom("GmarketSansTTFMedium", size: 14))
+                                    .frame(height: 20)
+                                Spacer()
+                            }
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
+                            .frame(height: 20)
+                        }
+                        
+                        ToDoListRowView(toDoListItem: toDoListViewModel.toDoList[index])
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
+                            .id(toDoListViewModel.toDoList[index].id)
+                        
+                    }
                 }
+                .onChange(of: toDoListViewModel.toDoList.count) { oldValue, newValue in
+                    if let lastToDoItem = toDoListViewModel.toDoList.last {
+                        withAnimation {
+                            proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
+                        }
+                    }
+                }
+                .onAppear {
+                    if let lastToDoItem = toDoListViewModel.toDoList.last {
+                        withAnimation {
+                            proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
+                        }
+                    }
+                }
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
+                .contentMargins(.horizontal, 0)
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
-            .contentMargins(.horizontal, 0)
             
             Spacer()
 
@@ -90,15 +122,18 @@ struct ToDoListView: View {
 #endif
     }
     
-    func getShowDateState(currentToDoItem: ToDoListData) -> Bool {
-        guard let preToDoListItem = toDoListViewModel.preToDoListData else {
-            toDoListViewModel.preToDoListData = currentToDoItem
+    func getShowDateState(index: Int) -> Bool {
+        if index == 0 {
             return true
         }
-        
-        if preToDoListItem.date.yyyyMMdd != currentToDoItem.date.yyyyMMdd {
-            toDoListViewModel.preToDoListData = currentToDoItem
-            return true
+        if index > 0 {
+            if index - 1 < toDoListViewModel.toDoList.count {
+                let preToDoListData = toDoListViewModel.toDoList[index - 1]
+                let currentToDoListData = toDoListViewModel.toDoList[index]
+                if preToDoListData.date.yyyyMMdd != currentToDoListData.date.yyyyMMdd {
+                    return true
+                }
+            }
         }
         return false
     }
