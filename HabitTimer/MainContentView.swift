@@ -117,6 +117,7 @@ struct PostitListView: View {
                 })
                 .buttonStyle(PlainButtonStyle())
             )
+            
 
         }
     }
