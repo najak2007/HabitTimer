@@ -37,4 +37,17 @@ class ToDoListViewModel: ObservableObject {
             
         }
     }
+    
+    func deleteToDoList(_ toDoListData: ToDoListData) {
+        guard let realm = realm else { return }
+        
+        do {
+            try realm.write {
+                realm.delete(toDoListData)
+                fetchToDoList()
+            }
+        } catch {
+            
+        }
+    }
 }
