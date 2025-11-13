@@ -24,6 +24,7 @@ struct PostitListView: View {
     @State private var editMode: EditMode = .inactive
     @State private var isEditing: Bool = false
     @State private var isAddToDoListShow: Bool = false
+    @State private var isDeleteAction: Bool = false
     
     let coloredNavAppearance = UINavigationBarAppearance()
     
@@ -59,6 +60,10 @@ struct PostitListView: View {
                     .onDelete(perform: deleteItems)
                 }
                 .onChange(of: toDoListViewModel.toDoList.count) { oldValue, newValue in
+                    if self.isDeleteAction == true {
+                        self.isDeleteAction = false
+                        return
+                    }
                     if let lastToDoItem = toDoListViewModel.toDoList.last {
                         withAnimation {
                             proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
@@ -67,9 +72,7 @@ struct PostitListView: View {
                 }
                 .onAppear {
                     if let lastToDoItem = toDoListViewModel.toDoList.last {
-                        //withAnimation {
-                            proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
-                        //}
+                        proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
                     }
                 }
                 .toolbar {
@@ -146,7 +149,11 @@ struct PostitListView: View {
     }
     
     func deleteItems(at offsets: IndexSet) {
-        print("deleteItems = \(offsets)")
+        guard let deleteIndex = toDoListViewModel.toDoList.indices.firstIndex(where: { offsets.contains($0) }) else { return }
+        guard deleteIndex < toDoListViewModel.toDoList.count else { return }
+        
+        self.isDeleteAction = true
+        toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex])
     }
 }
 
