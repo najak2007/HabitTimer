@@ -11,6 +11,9 @@ struct PostitListView: View {
     let postItName = [
         "Post_IT_Y",
         "Post_IT_B",
+        "Post_IT_G",
+        "Post_IT_P",
+        "Post_IT_R"
     ]
  
     @StateObject private var toDoListViewModel = ToDoListViewModel()
@@ -18,6 +21,9 @@ struct PostitListView: View {
     @State private var messageText: String = ""
     @State private var isFocused: Bool = false
     @State private var inputHeight: CGFloat = 42
+    @State private var editMode: EditMode = .inactive
+    @State private var isEditing: Bool = false
+    @State private var isAddToDoListShow: Bool = false
     
     let coloredNavAppearance = UINavigationBarAppearance()
     
@@ -41,14 +47,16 @@ struct PostitListView: View {
                             
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
-                                .frame(width: 300, height: 300)
-                                
+                                .frame(width: 280, height: 300)
+                                .lineSpacing(5)
+                            
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.white)
                         .listRowInsets(EdgeInsets())
                         .id(toDoListViewModel.toDoList[index].id)
                     }
+                    .onDelete(perform: deleteItems)
                 }
                 .onChange(of: toDoListViewModel.toDoList.count) { oldValue, newValue in
                     if let lastToDoItem = toDoListViewModel.toDoList.last {
@@ -59,66 +67,72 @@ struct PostitListView: View {
                 }
                 .onAppear {
                     if let lastToDoItem = toDoListViewModel.toDoList.last {
-                        withAnimation {
+                        //withAnimation {
                             proxy.scrollTo(lastToDoItem.id, anchor: .bottom)
-                        }
+                        //}
                     }
                 }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        if self.editMode == .inactive {
+                            Button(action: {
+                                self.isAddToDoListShow.toggle()
+                            }, label: {
+                                Image(systemName: "square.and.pencil")
+                                    .resizable()
+                                    .frame(width: 25, height: 25)
+                                    .foregroundColor(Color("1F2020"))
+                            })
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
+                    }
+                }
+                .simultaneousGesture(DragGesture().onChanged({ _ in
+                    if self.isAddToDoListShow {
+                        self.isAddToDoListShow.toggle()
+                    }
+                }))
+                .environment(\.editMode, $editMode)
                 
                 .scrollContentBackground(.hidden)
                 .background(.white)
                 .contentMargins(.horizontal, 0)
-                .padding(.top, -32)
+                .padding(.top, -34)
                 
-//                HStack(spacing: 10) {
-//                    VStack(alignment: .leading, spacing: 0) {
-//                        UITextViewRepresentable(text: $messageText, isFocused: $isFocused, inputHeight: $inputHeight)
-//                            .frame(height: inputHeight)
-//                    }
-//                    
-//                    Button(action: {
-//                        guard messageText.isEmpty == false else { return }
-//                        let trimString = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
-//                        guard trimString.isEmpty == false else { return }
-//                        
-//                        let newToDoData = ToDoListData()
-//                        newToDoData.setMessageText(messageText: trimString)
-//                        toDoListViewModel.addToDoList(newToDoData)
-//                        messageText = ""
-//                    }, label: {
-//                        Image(systemName: "arrowshape.up.circle.fill")
-//                            .resizable()
-//                            .frame(width: 40, height: 40)
-//                            .foregroundColor(Color("1F2020"))
-//                    })
-//                }
-//                .padding(.horizontal, 10)
-//                .padding(.bottom, 10)
-//                .background(.clear)
+                
+                if isAddToDoListShow == true {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            UITextViewRepresentable(text: $messageText, isFocused: $isFocused, inputHeight: $inputHeight)
+                                .frame(height: inputHeight)
+                        }
+                        
+                        Button(action: {
+                            guard messageText.isEmpty == false else { return }
+                            let trimString = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard trimString.isEmpty == false else { return }
+                            
+                            let newToDoData = ToDoListData()
+                            newToDoData.setMessageText(messageText: trimString)
+                            toDoListViewModel.addToDoList(newToDoData)
+                            messageText = ""
+                            self.isAddToDoListShow.toggle()
+                        }, label: {
+                            Image(systemName: "arrowshape.up.circle.fill")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .foregroundColor(Color("1F2020"))
+                        })
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 10)
+                    .background(.clear)
+                }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button(action: {
-                    
-                }, label: {
-                    Text("편집")
-                        .font(.custom("GmarketSansTTFMedium", size: 16))
-                        .foregroundColor(.black)
-                })
-                .buttonStyle(PlainButtonStyle()),
-                
-                trailing: Button(action: {
-                    
-                }, label: {
-                    Image(systemName: "square.and.pencil")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(Color("1F2020"))
-                })
-                .buttonStyle(PlainButtonStyle())
-            )
-            
-
         }
     }
     
@@ -129,5 +143,15 @@ struct PostitListView: View {
             remaining = 0
         }
         return postItName[remaining]
+    }
+    
+    func deleteItems(at offsets: IndexSet) {
+        print("deleteItems = \(offsets)")
+    }
+}
+
+extension EditMode {
+    mutating func toggle() {
+        self = self == .active ? .inactive : .active
     }
 }
