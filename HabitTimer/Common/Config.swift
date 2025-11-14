@@ -20,4 +20,6 @@ class Config {
     static let POMODORO_REST_TIME_MINUTE: Double = 5
     
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
+    
+    static let TEXTVIEW_SHOW_ANIMATION_INTERVAL: CGFloat = 0.5
 }
