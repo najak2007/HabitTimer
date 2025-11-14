@@ -79,7 +79,9 @@ struct PostitListView: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         if self.editMode == .inactive {
                             Button(action: {
-                                self.isAddToDoListShow.toggle()
+                                withAnimation(.easeIn(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
+                                    self.isAddToDoListShow.toggle()
+                                }
                             }, label: {
                                 Image(systemName: "square.and.pencil")
                                     .resizable()
@@ -96,7 +98,9 @@ struct PostitListView: View {
                 }
                 .simultaneousGesture(DragGesture().onChanged({ _ in
                     if self.isAddToDoListShow {
-                        self.isAddToDoListShow.toggle()
+                        withAnimation(.easeOut(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
+                            self.isAddToDoListShow.toggle()
+                        }
                     }
                 }))
                 .environment(\.editMode, $editMode)
@@ -106,37 +110,45 @@ struct PostitListView: View {
                 .contentMargins(.horizontal, 0)
                 .padding(.top, -34)
                 
-                
-                if isAddToDoListShow == true {
-                    HStack(spacing: 10) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            UITextViewRepresentable(text: $messageText, isFocused: $isFocused, inputHeight: $inputHeight)
-                                .frame(height: inputHeight)
-                        }
+                .overlay {
+                    VStack(spacing: 10) {
+                        Spacer()
                         
-                        Button(action: {
-                            guard messageText.isEmpty == false else { return }
-                            let trimString = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard trimString.isEmpty == false else { return }
+                        HStack(spacing: 10) {
+                            VStack(alignment: .leading, spacing: 0) {
+                                UITextViewRepresentable(text: $messageText, isFocused: $isFocused, inputHeight: $inputHeight)
+                                    .frame(height: inputHeight)
+                            }
                             
-                            let newToDoData = ToDoListData()
-                            newToDoData.setMessageText(messageText: trimString)
-                            toDoListViewModel.addToDoList(newToDoData)
-                            messageText = ""
-                            self.isAddToDoListShow.toggle()
-                        }, label: {
-                            Image(systemName: "arrowshape.up.circle.fill")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(Color("1F2020"))
-                        })
+                            Button(action: {
+                                guard messageText.isEmpty == false else { return }
+                                let trimString = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                guard trimString.isEmpty == false else { return }
+                                
+                                let newToDoData = ToDoListData()
+                                newToDoData.setMessageText(messageText: trimString)
+                                toDoListViewModel.addToDoList(newToDoData)
+                                messageText = ""
+                                withAnimation(.easeOut(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
+                                    self.isAddToDoListShow.toggle()
+                                }
+                            }, label: {
+                                Image(systemName: "arrowshape.up.circle.fill")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(Color("1F2020"))
+                            })
+                            
+                        }
+                        .padding()
+                        .background(.white)
+                        
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 10)
-                    .background(.clear)
+                    .opacity(self.isAddToDoListShow == true ? 1 : 0)
                 }
             }
         }
+        .ignoresSafeArea()
     }
     
     func getImageName(index: Int) -> String {
@@ -156,6 +168,8 @@ struct PostitListView: View {
         toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex])
     }
 }
+
+
 
 extension EditMode {
     mutating func toggle() {
