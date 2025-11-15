@@ -22,6 +22,8 @@ class TimerManager: ObservableObject {
                 if self.timeRemaining >= Config.POMODORO_TIME_MINUTE {
                     self.timeRemaining = 0
                     minutePassed.send(true)     // Void로 하면 .send() 로 해도 된다.
+                } else {
+                    minutePassed.send(false)
                 }
             }
             isPaused = false
@@ -43,7 +45,6 @@ class TimerManager: ObservableObject {
     func resetTimer() {
         timer?.invalidate()
         timer = nil
-        timeRemaining = Config.POMODORO_DEFAULT_MINUTE
         isPaused = true
     }
 }

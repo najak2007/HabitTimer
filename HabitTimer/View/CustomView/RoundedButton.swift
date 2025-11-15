@@ -17,6 +17,7 @@ struct RoundedButton: View {
     var foregroundColor: Color = Color("B_1F2020")
     var height: CGFloat = 40
     var backgroundWidth: CGFloat = 120
+    var cornerRadius: CGFloat = 10
     var action: () -> Void
     
     var body: some View {
@@ -45,7 +46,7 @@ struct RoundedButton: View {
             .font(.custom(fontName, size: fontSize))
             .background(backgroundColor)                    // 배경색 설정
             .foregroundStyle(foregroundColor)               // 글자 색상 설정
-            .cornerRadius(10)
+            .cornerRadius(cornerRadius)
         }
         .padding(.horizontal)
     }

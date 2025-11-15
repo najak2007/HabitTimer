@@ -15,6 +15,7 @@ struct ContentView: View {
     
     @State private var elapsedTime: Double = 0.0
     @State private var isPomodoroTimer: Bool = false
+    @State private var isBubbleView: Bool = false
     
     // UI Config
     private let themeColor: Color = Color(red: 252/255, green: 95/255, blue: 163/255)
@@ -40,6 +41,12 @@ struct ContentView: View {
                 }, label: {
                     Text("Pomodoro View")
                 })
+                
+                Button(action: {
+                    self.isBubbleView.toggle()
+                }, label: {
+                    Text("Bubble Example")
+                })
             }
         }
         .onReceive(timer) { _ in
@@ -58,5 +65,11 @@ struct ContentView: View {
         }) {
             PomodoroView()
         }
+        .fullScreenCover(isPresented: $isBubbleView, onDismiss: {
+            
+        }) {
+            ToDoListView()
+        }
+        
     }
 }

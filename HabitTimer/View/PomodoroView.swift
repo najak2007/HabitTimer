@@ -26,8 +26,9 @@ struct PomodoroView: View {
     @State private var color: Color = .red
     @State private var backgroundColor: Color = Color("CircleTimeBackground")
     @State private var elapsedTime: Double = 0.0
-    @State private var selectedMinute: Double = Config.POMODORO_DEFAULT_MINUTE
+    @State private var selectedMinute: Double = Config.POMODORO_WORK_TIME_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
+    @State private var timerDisplay: String = "00:00"
     
     var body: some View {
         NavigationView {
@@ -78,11 +79,17 @@ struct PomodoroView: View {
                                     .trim(from: 0.0, to: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE)
                                     .stroke(themeColor, style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
                                     .rotationEffect(Angle(degrees: 270))
-                                    .animation(.easeInOut(duration: self.elapsedTime == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
+                                    .animation(.smooth(duration: timerManager.timeRemaining == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
                                     .padding(2)
                                     
                                 
                             }
+                        
+                        Text(timerDisplay)
+                            .font(.system(size: 50, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundColor(Color("1F2020"))
+                            .italic()
                     }
                 }
                 if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
@@ -98,6 +105,12 @@ struct PomodoroView: View {
                     .padding(.bottom, 50)
                 } else {
                     RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
+                        if pomodoroState == .할일_완료 {
+                            self.selectedMinute = Config.POMODORO_REST_TIME_MINUTE
+                            self.setStartAction()
+                        } else if pomodoroState == .휴식_완료 {
+                            self.setStartAction()
+                        }
                         setPomodoroStateChange()
                     })
                     .padding(.bottom, 50)
@@ -108,8 +121,8 @@ struct PomodoroView: View {
             }
         }
         .onReceive(minutePassed) { value in
+            getSecondTimeToMinuteTime()
             if value {
-                self.selectedMinute = self.selectedMinute - 1
                 getTimerForAngle()
             }
         }
@@ -138,14 +151,33 @@ struct PomodoroView: View {
             secondTimer.upstream.connect().cancel()
         }
         .onAppear {
-            getTimerForAngle()
+            self.setStartAction()
         }
+    }
+    
+    func setStartAction() {
+        getSecondTimeToMinuteTime()
+        getTimerForAngle()
     }
     
     func getTimerForAngle() {
         let startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (selectedMinute * Config.POMODORO_TIME_MINUTE))
         
+        self.selectedMinute = self.selectedMinute - 1
+        
         print("getTimerForAngle = \(startAngle)")
+        
+        if self.selectedMinute < 0 {
+            if pomodoroState == .할일_진행중 {
+                pomodoroState = .할일_완료
+            } else if pomodoroState == .휴식_진행중 {
+                pomodoroState = .휴식_완료
+            }
+            
+            timerManager.pauseTimer()
+            self.endPercent = 360
+            return
+        }
         
         self.endPercent = startAngle
     }
@@ -207,5 +239,16 @@ struct PomodoroView: View {
         } else if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
             timerManager.pauseTimer()
         }
+    }
+    
+    func getSecondTimeToMinuteTime() {
+        var secondValue: Int = Int(Config.POMODORO_TIME_MINUTE) - Int(timerManager.timeRemaining)
+        let minuteValue: Int = Int(selectedMinute)
+        
+        if secondValue == 60 {
+            secondValue = 0
+        }
+        
+        timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
     }
 }
