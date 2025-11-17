@@ -25,6 +25,11 @@ struct PostitListView: View {
     @State private var isEditing: Bool = false
     @State private var isAddToDoListShow: Bool = false
     @State private var isDeleteAction: Bool = false
+    @State private var isExpanded: Bool = false
+    @State private var size: CGSize = .zero
+    @State private var rowHeight: CGFloat = Config.TODOLIST_ROW_HEIGHT
+
+    @Namespace private var animation
     
     let coloredNavAppearance = UINavigationBarAppearance()
     
@@ -48,13 +53,15 @@ struct PostitListView: View {
                             
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
-                                .frame(width: 280, height: 300)
+                                .frame(width: 280, height: Config.TODOLIST_ROW_HEIGHT - 40)
                                 .lineSpacing(5)
-                            
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.white)
                         .listRowInsets(EdgeInsets())
+                        .onTapGesture {
+                            self.isExpanded.toggle()
+                        }
                         .id(toDoListViewModel.toDoList[index].id)
                     }
                     .onDelete(perform: deleteItems)
@@ -148,15 +155,24 @@ struct PostitListView: View {
                 }
             }
         }
+        .onChange(of: self.isAddToDoListShow) { oldValue, newValue in
+            if oldValue, newValue == false {
+                UIApplication.shared.endEditing()
+            }
+        }
         .ignoresSafeArea()
     }
     
     func getImageName(index: Int) -> String {
+#if false        // 랜덤하게 배경 이미지 변경하기
+        var remaining: Int = Int.random(in: 0...(postItName.count - 1))
+#else
         var remaining = index % postItName.count
         
         if remaining >= postItName.count {
             remaining = 0
         }
+#endif
         return postItName[remaining]
     }
     
