@@ -50,7 +50,6 @@ struct PostitListView: View {
                         ZStack {
                             Image(getImageName(index: index))
                                 .resizable()
-                            
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
                                 .frame(width: 280, height: Config.TODOLIST_ROW_HEIGHT - 40)
