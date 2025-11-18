@@ -30,6 +30,11 @@ struct PomodoroView: View {
     @State private var pomodoroState: PomodoroState = .초기화
     @State private var timerDisplay: String = "00:00"
     
+    @Binding var toDoListData: ToDoListData
+    @Binding var isDetailShow: Bool
+    
+    @State private var showing = false
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -126,32 +131,44 @@ struct PomodoroView: View {
                 getTimerForAngle()
             }
         }
-//        .onReceive(secondTimer) { _ in
-//            let elapsedTime: Double = Date().timeIntervalSinceReferenceDate - startTime.timeIntervalSinceReferenceDate
-//            
-//            if elapsedTime < Config.POMODORO_TIME_MINUTE {
-//                self.elapsedTime = elapsedTime
-//                self.themeColor = Color("1F2020")
-//            } else {
-//                self.elapsedTime = 0
-//                self.startTime = Date()
-//                self.themeColor = .clear
-//            }
-//            
-//            if elapsedTime >= Config.POMODORO_TIME_MINUTE  {
-//                self.selectedMinute = self.selectedMinute - 1
-//                
-//                if self.selectedMinute < 0 {
-//                    secondTimer.upstream.connect().cancel()
-//                }
-//                getTimerForAngle()
-//            }
-//        }
+#if __NOT_USE__
+        .onReceive(secondTimer) { _ in
+            let elapsedTime: Double = Date().timeIntervalSinceReferenceDate - startTime.timeIntervalSinceReferenceDate
+            
+            if elapsedTime < Config.POMODORO_TIME_MINUTE {
+                self.elapsedTime = elapsedTime
+                self.themeColor = Color("1F2020")
+            } else {
+                self.elapsedTime = 0
+                self.startTime = Date()
+                self.themeColor = .clear
+            }
+            
+            if elapsedTime >= Config.POMODORO_TIME_MINUTE  {
+                self.selectedMinute = self.selectedMinute - 1
+                
+                if self.selectedMinute < 0 {
+                    secondTimer.upstream.connect().cancel()
+                }
+                getTimerForAngle()
+            }
+        }
+#endif
+
+        .rotation3DEffect(.degrees(showing ? 0 : -180), axis: (x: 1, y: 0, z: 0))
+#if __NOT_USE__
+        .animation(.spring(duration: 0.3, bounce: 0.7), value: showing)
+#else
+        .animation(.smooth, value: showing)
+#endif
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.2)) {
+                self.setStartAction()
+                showing = true
+            }
+        }
         .onDisappear {
             secondTimer.upstream.connect().cancel()
-        }
-        .onAppear {
-            self.setStartAction()
         }
     }
     

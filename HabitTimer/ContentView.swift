@@ -63,7 +63,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $isPomodoroTimer, onDismiss: {
             
         }) {
-            PomodoroView()
+            //PomodoroView()
         }
         .fullScreenCover(isPresented: $isBubbleView, onDismiss: {
             

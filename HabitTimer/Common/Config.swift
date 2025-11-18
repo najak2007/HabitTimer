@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum InputTypeError {
+    case 할일_미입력
+    case 할일_글자수_초과
+}
+
 class Config {
     static let NAVIGATION_HEIGHT: CGFloat = 80
     static let INPUT_VIEW_HEADER_FONT_SIZE: CGFloat = 14
@@ -24,4 +29,5 @@ class Config {
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
     
     static let TEXTVIEW_SHOW_ANIMATION_INTERVAL: CGFloat = 0.5
+    static let INPUT_TEXT_COUNT_LIMIT: Int = 100
 }
