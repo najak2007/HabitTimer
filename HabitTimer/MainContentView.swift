@@ -17,7 +17,6 @@ struct PostitListView: View {
     ]
  
     @StateObject private var toDoListViewModel = ToDoListViewModel()
-    @State private var isEditMode: Bool = false
     @State private var messageText: String = ""
     @State private var isFocused: Bool = false
     @State private var inputHeight: CGFloat = 42
@@ -25,10 +24,13 @@ struct PostitListView: View {
     @State private var isEditing: Bool = false
     @State private var isAddToDoListShow: Bool = false
     @State private var isDeleteAction: Bool = false
-    @State private var isExpanded: Bool = false
+    @State private var isDetailShow: Bool = false
     @State private var size: CGSize = .zero
     @State private var rowHeight: CGFloat = Config.TODOLIST_ROW_HEIGHT
-
+    @State private var toast: Toast? = nil
+    @State private var messageTextEditorID: String = ""
+    @State private var selectedToDoListData: ToDoListData = ToDoListData()
+    
     @Namespace private var animation
     
     let coloredNavAppearance = UINavigationBarAppearance()
@@ -50,16 +52,26 @@ struct PostitListView: View {
                         ZStack {
                             Image(getImageName(index: index))
                                 .resizable()
-                            Text(toDoListViewModel.toDoList[index].messageText)
-                                .font(.custom("GmarketSansTTFMedium", size: 24))
-                                .frame(width: 280, height: Config.TODOLIST_ROW_HEIGHT - 40)
-                                .lineSpacing(5)
+                            InputToDoListView(toDoListData: toDoListViewModel.toDoList[index], index: index, disabledID: $messageTextEditorID) { toDoListItem, mesageText in
+                                
+                            } inputErrorHandler: { errorMessage in
+                                toast = Toast(type: .error, title: "", message: errorMessage)
+                            }
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.white)
                         .listRowInsets(EdgeInsets())
                         .onTapGesture {
-                            self.isExpanded.toggle()
+#if true
+                            self.isDetailShow.toggle()
+                            self.selectedToDoListData = toDoListViewModel.toDoList[index]
+#else
+                            if editMode == .active {
+                                messageTextEditorID = toDoListViewModel.toDoList[index].id
+                            } else {
+                                
+                            }
+#endif
                         }
                         .id(toDoListViewModel.toDoList[index].id)
                     }
@@ -159,6 +171,21 @@ struct PostitListView: View {
                 UIApplication.shared.endEditing()
             }
         }
+        .onChange(of: self.editMode) { oldValue, newValue in
+            if oldValue == .active, newValue == .inactive {
+                self.messageTextEditorID = ""
+                UIApplication.shared.endEditing()
+            }
+        }
+        .fullScreenCover(isPresented: $isDetailShow, content: {
+            PomodoroView(toDoListData: $selectedToDoListData, isDetailShow: $isDetailShow)
+        })
+        .transaction { transaction in
+            transaction.disablesAnimations = true
+            
+        }
+        .toastView(toast: $toast)
+
         .ignoresSafeArea()
     }
     
