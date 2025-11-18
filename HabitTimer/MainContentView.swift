@@ -30,6 +30,7 @@ struct PostitListView: View {
     @State private var toast: Toast? = nil
     @State private var messageTextEditorID: String = ""
     @State private var selectedToDoListData: ToDoListData = ToDoListData()
+    @State private var selectedIndex: Int = 0
     
     @Namespace private var animation
     
@@ -65,6 +66,7 @@ struct PostitListView: View {
 #if true
                             self.isDetailShow.toggle()
                             self.selectedToDoListData = toDoListViewModel.toDoList[index]
+                            self.selectedIndex = index
 #else
                             if editMode == .active {
                                 messageTextEditorID = toDoListViewModel.toDoList[index].id
@@ -178,7 +180,7 @@ struct PostitListView: View {
             }
         }
         .fullScreenCover(isPresented: $isDetailShow, content: {
-            PomodoroView(toDoListData: $selectedToDoListData, isDetailShow: $isDetailShow)
+            PomodoroView(toDoListData: $selectedToDoListData, isDetailShow: $isDetailShow, index: self.selectedIndex)
         })
         .transaction { transaction in
             transaction.disablesAnimations = true

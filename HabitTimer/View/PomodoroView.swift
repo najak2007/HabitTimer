@@ -32,6 +32,7 @@ struct PomodoroView: View {
     
     @Binding var toDoListData: ToDoListData
     @Binding var isDetailShow: Bool
+    var index: Int = 0
     
     @State private var showing = false
     
@@ -162,6 +163,14 @@ struct PomodoroView: View {
         .animation(.smooth, value: showing)
 #endif
         .onAppear {
+            
+            var remaining = index % 5
+            
+            if remaining >= 5 {
+                remaining = 0
+            }
+            color = Color("STICKER_\(remaining)")
+            
             withAnimation(.easeOut(duration: 0.2)) {
                 self.setStartAction()
                 showing = true
