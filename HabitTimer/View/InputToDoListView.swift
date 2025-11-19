@@ -33,6 +33,7 @@ struct InputToDoListView: View {
         VStack {
             TextField("작업할 일을 적어주세요.", text: $messageText, axis: .vertical)
                 .font(.custom("GmarketSansTTFMedium", size: fontSize))
+                .clearButton(text: $messageText)
                 .lineLimit(1...maxLine)
                 .multilineTextAlignment(messageText.isEmpty ? .leading : .center)
                 .frame(maxWidth: maxWidth, idealHeight: 40, maxHeight: inputHeight/*Config.TODOLIST_ROW_HEIGHT - 40 */)
@@ -42,26 +43,7 @@ struct InputToDoListView: View {
                     RoundedRectangle(cornerRadius: 5)
                         .stroke(self.color, lineWidth: 3).opacity(0.6)
                 )
-                .onChange(of: messageText) { oldValue, newValue in
-                    if newValue.count > Config.INPUT_TEXT_COUNT_LIMIT {
-                        inputErrorHandler("\(Config.INPUT_TEXT_COUNT_LIMIT) 글자를 초과할 수 없습니다.")
-                        messageText = oldValue
-                    }
-                    if oldValue != newValue {
-                        self.inputHeight = setTextFieldHeight(text: newValue)
-                    }
-                }
-                .onAppear {
-                    self.messageText = toDoListData.messageText
-                    self.originalText = toDoListData.messageText
-                    
-                    var remaining = index % Config.MAIN_STICKER_COUNT
-                    
-                    if remaining >= Config.MAIN_STICKER_COUNT {
-                        remaining = 0
-                    }
-                    color = Color("STICKER_\(remaining)")
-                }
+                .shadow(color: .gray, radius: 5, x: 1, y: 2)
                 .toolbar {
                     ToolbarItem(placement: .keyboard) {
                         HStack {
@@ -85,6 +67,26 @@ struct InputToDoListView: View {
                             })
                         }
                     }
+                }
+                .onChange(of: messageText) { oldValue, newValue in
+                    if newValue.count > Config.INPUT_TEXT_COUNT_LIMIT {
+                        inputErrorHandler("\(Config.INPUT_TEXT_COUNT_LIMIT) 글자를 초과할 수 없습니다.")
+                        messageText = oldValue
+                    }
+                    if oldValue != newValue {
+                        self.inputHeight = setTextFieldHeight(text: newValue)
+                    }
+                }
+                .onAppear {
+                    self.messageText = toDoListData.messageText
+                    self.originalText = toDoListData.messageText
+                    
+                    var remaining = index % Config.MAIN_STICKER_COUNT
+                    
+                    if remaining >= Config.MAIN_STICKER_COUNT {
+                        remaining = 0
+                    }
+                    color = Color("STICKER_\(remaining)")
                 }
         }
     }

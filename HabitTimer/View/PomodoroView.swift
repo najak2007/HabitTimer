@@ -42,7 +42,15 @@ struct PomodoroView: View {
         NavigationView {
             VStack {
                 HStack {
-
+                    Button(action: {
+                        dismiss()
+                    }, label: {
+                        Image(systemName: "chevron.backward.circle.fill")
+                            .resizable()
+                            .frame(width: 35, height: 35)
+                            .foregroundColor(Color("1F2020"))
+                    })
+                    
                     Spacer()
 
                     InputToDoListView(toDoListData: toDoListData, index: index, fontSize: 22, maxLine: 3, maxWidth: 300) { toDoListItem, mesageText in
@@ -52,16 +60,6 @@ struct PomodoroView: View {
                     }
 
                     Spacer()
-
-                    Button(action: {
-                        dismiss()
-                    }, label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .resizable()
-                            .frame(width: 35, height: 35)
-                            .foregroundColor(Color("1F2020"))
-                    })
-                    
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
@@ -104,7 +102,7 @@ struct PomodoroView: View {
                             }
                         
                         Text(timerDisplay)
-                            .font(.system(size: 50, weight: .semibold))
+                            .font(.system(size: 60, weight: .semibold))
                             .monospacedDigit()
                             .foregroundColor(Color("1F2020"))
                             .italic()
