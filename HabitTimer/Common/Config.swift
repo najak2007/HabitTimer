@@ -29,5 +29,11 @@ class Config {
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
     
     static let TEXTVIEW_SHOW_ANIMATION_INTERVAL: CGFloat = 0.5
-    static let INPUT_TEXT_COUNT_LIMIT: Int = 100
+    static let INPUT_TEXT_COUNT_LIMIT: Int = 80
+    
+    static let INPUT_TEXT_FIELD_DEFAULT_HEIGHT: CGFloat = 40
+    static let INPUT_TEXT_FIELD_MAX_HEIGHT: CGFloat = 100
+    static let INPUT_TEXT_FIELD_MARGIN: CGFloat = 25
+    
+    static let MAIN_STICKER_COUNT: Int = 5
 }

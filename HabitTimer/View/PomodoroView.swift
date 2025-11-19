@@ -29,9 +29,11 @@ struct PomodoroView: View {
     @State private var selectedMinute: Double = Config.POMODORO_WORK_TIME_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
     @State private var timerDisplay: String = "00:00"
+    @State private var toast: Toast? = nil
     
     @Binding var toDoListData: ToDoListData
     @Binding var isDetailShow: Bool
+    @State private var messageText: String = ""
     var index: Int = 0
     
     @State private var showing = false
@@ -40,8 +42,17 @@ struct PomodoroView: View {
         NavigationView {
             VStack {
                 HStack {
+
                     Spacer()
-                    
+
+                    InputToDoListView(toDoListData: toDoListData, index: index, fontSize: 22, maxLine: 3, maxWidth: 300) { toDoListItem, mesageText in
+                        
+                    } inputErrorHandler: { errorMessage in
+                        toast = Toast(type: .error, title: "", message: errorMessage)
+                    }
+
+                    Spacer()
+
                     Button(action: {
                         dismiss()
                     }, label: {
@@ -50,6 +61,7 @@ struct PomodoroView: View {
                             .frame(width: 35, height: 35)
                             .foregroundColor(Color("1F2020"))
                     })
+                    
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
@@ -98,6 +110,7 @@ struct PomodoroView: View {
                             .italic()
                     }
                 }
+                .padding(.horizontal, 20)
                 if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
                     HStack(spacing: 30) {
                         RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
@@ -121,9 +134,6 @@ struct PomodoroView: View {
                     })
                     .padding(.bottom, 50)
                 }
-                
-                Text("TimerManager.timeRemaining = \(timerManager.timeRemaining)")
-                    .padding()
             }
         }
         .onReceive(minutePassed) { value in
@@ -164,9 +174,9 @@ struct PomodoroView: View {
 #endif
         .onAppear {
             
-            var remaining = index % 5
+            var remaining = index % Config.MAIN_STICKER_COUNT
             
-            if remaining >= 5 {
+            if remaining >= Config.MAIN_STICKER_COUNT {
                 remaining = 0
             }
             color = Color("STICKER_\(remaining)")
@@ -176,6 +186,7 @@ struct PomodoroView: View {
                 showing = true
             }
         }
+        .toastView(toast: $toast)
         .onDisappear {
             secondTimer.upstream.connect().cancel()
         }
