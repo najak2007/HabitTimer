@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct PostitListView: View {
     let postItName = [
         "Post_IT_Y",
@@ -29,8 +30,7 @@ struct PostitListView: View {
     @State private var rowHeight: CGFloat = Config.TODOLIST_ROW_HEIGHT
     @State private var toast: Toast? = nil
     @State private var messageTextEditorID: String = ""
-    @State private var selectedToDoListData: ToDoListData = ToDoListData()
-    @State private var selectedIndex: Int = 0
+    @State private var textWidth: CGFloat = 0
     
     @Namespace private var animation
     
@@ -53,20 +53,22 @@ struct PostitListView: View {
                         ZStack {
                             Image(getImageName(index: index))
                                 .resizable()
-                            InputToDoListView(toDoListData: toDoListViewModel.toDoList[index], index: index, disabledID: $messageTextEditorID) { toDoListItem, mesageText in
-                                
-                            } inputErrorHandler: { errorMessage in
-                                toast = Toast(type: .error, title: "", message: errorMessage)
-                            }
+
+                            Text(toDoListViewModel.toDoList[index].messageText)
+                                .font(.custom("GmarketSansTTFMedium", size: 24))
+                                .lineLimit(1...5)
+                                .multilineTextAlignment(.center)
+                                .frame(maxWidth: 280, maxHeight: Config.TODOLIST_ROW_HEIGHT - 40)
+                                .lineSpacing(5)
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.white)
                         .listRowInsets(EdgeInsets())
                         .onTapGesture {
 #if true
+                            self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
+                            self.toDoListViewModel.selectedIndex = index
                             self.isDetailShow.toggle()
-                            self.selectedToDoListData = toDoListViewModel.toDoList[index]
-                            self.selectedIndex = index
 #else
                             if editMode == .active {
                                 messageTextEditorID = toDoListViewModel.toDoList[index].id
@@ -180,7 +182,7 @@ struct PostitListView: View {
             }
         }
         .fullScreenCover(isPresented: $isDetailShow, content: {
-            PomodoroView(toDoListData: $selectedToDoListData, isDetailShow: $isDetailShow, index: self.selectedIndex)
+            PomodoroView(toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
         })
         .transaction { transaction in
             transaction.disablesAnimations = true
