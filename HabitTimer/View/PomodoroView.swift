@@ -247,9 +247,9 @@ struct PomodoroView: View {
     }
     
     func getTimerForAngle() {
-        let startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
+        var startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
         
-        if self.minuteValue < 0 {
+        if self.minuteValue <= 0 {
             if pomodoroState == .할일_진행중 {
                 pomodoroState = .할일_완료
             } else if pomodoroState == .휴식_진행중 {
@@ -259,6 +259,8 @@ struct PomodoroView: View {
             timerManager.pauseTimer()
             self.endPercent = 360
             return
+        } else if self.minuteValue == 60, startAngle == 360 {
+            startAngle = 0
         }
         
         withAnimation(.easeInOut(duration: 0.2)) {
@@ -327,8 +329,6 @@ struct PomodoroView: View {
     
     func getSecondTimeToMinuteTime() {
         var secondValue: Int = Int(Config.POMODORO_TIME_MINUTE) - Int(timerManager.timeRemaining)
-        
-        print("getSecondTimeToMinuteTime secondValue = \(secondValue), minuteValue = \(minuteValue)")
         
         if secondValue == Int(Config.POMODORO_TIME_MINUTE) {
             secondValue = 0
