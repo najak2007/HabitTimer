@@ -29,7 +29,7 @@ final class ToDoListData: Object, Comparable {
     @objc dynamic var isDone: Bool = false
     @objc dynamic var isRepeat: Bool = false
     @objc dynamic var placeName: String = ""
-    @objc dynamic var selectedMinute: Double = Config.POMODORO_WORK_TIME_MINUTE
+    @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
     @objc dynamic var remainingTime: Double = 0
     
     static func < (lhs: ToDoListData, rhs: ToDoListData) -> Bool {
