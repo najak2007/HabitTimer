@@ -51,4 +51,18 @@ class ToDoListViewModel: ObservableObject {
             
         }
     }
+    
+    func updateToDoMessageText(toDoListData: ToDoListData, messageText: String) {
+        guard let realm = realm else { return }
+        
+        do {
+            try realm.write {
+                toDoListData.messageText = messageText
+                fetchToDoList()
+            }
+            
+        } catch {
+            
+        }
+    }
 }

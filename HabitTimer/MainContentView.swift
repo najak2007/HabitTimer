@@ -56,6 +56,7 @@ struct PostitListView: View {
 
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
+                                .foregroundColor(.black)
                                 .lineLimit(1...5)
                                 .multilineTextAlignment(.center)
                                 .frame(maxWidth: 280, maxHeight: Config.TODOLIST_ROW_HEIGHT - 40)
@@ -116,6 +117,7 @@ struct PostitListView: View {
                     
                     ToolbarItem(placement: .navigationBarTrailing) {
                         EditButton()
+                            .foregroundColor(.black)
                     }
                 }
                 .simultaneousGesture(DragGesture().onChanged({ _ in
@@ -158,7 +160,7 @@ struct PostitListView: View {
                                 Image(systemName: "arrowshape.up.circle.fill")
                                     .resizable()
                                     .frame(width: 40, height: 40)
-                                    .foregroundColor(Color("1F2020"))
+                                    .foregroundColor(.black)
                             })
                             
                         }
@@ -182,7 +184,7 @@ struct PostitListView: View {
             }
         }
         .fullScreenCover(isPresented: $isDetailShow, content: {
-            PomodoroView(toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+            PomodoroView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
         })
         .transaction { transaction in
             transaction.disablesAnimations = true

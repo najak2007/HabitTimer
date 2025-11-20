@@ -15,6 +15,7 @@ struct PomodoroView: View {
     private let secondTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
     @StateObject private var timerManager = TimerManager()
+ //   @StateObject private var toDoListViewModel = ToDoListViewModel()
     
     @State private var themeColor: Color = Color("TimerSecond_B")
     
@@ -26,11 +27,15 @@ struct PomodoroView: View {
     @State private var color: Color = .red
     @State private var backgroundColor: Color = Color("CircleTimeBackground")
     @State private var elapsedTime: Double = 0.0
-    @State private var selectedMinute: Double = Config.POMODORO_WORK_TIME_MINUTE
+    @State private var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
+    @State private var minuteValue: Int = Config.POMODORO_WORK_TIME_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
     @State private var timerDisplay: String = "00:00"
     @State private var toast: Toast? = nil
+    @State private var isDoneButtonShow: Bool = false
+    @State private var isTimePickerShow: Bool = false
     
+    var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
     @Binding var isDetailShow: Bool
     @State private var messageText: String = ""
@@ -41,7 +46,7 @@ struct PomodoroView: View {
     var body: some View {
         NavigationView {
             VStack {
-                HStack {
+                HStack(spacing: 8) {
                     Button(action: {
                         dismiss()
                     }, label: {
@@ -53,16 +58,31 @@ struct PomodoroView: View {
                     
                     Spacer()
 
-                    InputToDoListView(toDoListData: toDoListData, index: index, fontSize: 22, maxLine: 3, maxWidth: 300) { toDoListItem, mesageText in
+                    InputToDoListView(toDoListData: toDoListData, messageText: $messageText, index: index, fontSize: 22, maxLine: 3, maxWidth: 300) { toDoListItem, mesageText in
                         
                     } inputErrorHandler: { errorMessage in
                         toast = Toast(type: .error, title: "", message: errorMessage)
+                    } inputBeginEditingHandler: { isShow in
+                        self.isDoneButtonShow = isShow
                     }
 
                     Spacer()
+                    
+                    Button(action: {
+                        toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                    }, label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .resizable()
+                            .frame(width: 35, height: 35)
+                            .foregroundColor(Color("1F2020"))
+                    })
+                    .opacity(isDoneButtonShow ? 1 : 0)
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
+                .onAppear {
+                    self.messageText = self.toDoListData.messageText
+                }
                 
                 
                 GeometryReader { geometryProxy in
@@ -88,6 +108,7 @@ struct PomodoroView: View {
                         .frame(width: geometryProxy.size.width,
                                height: geometryProxy.size.height,
                                alignment: .center)
+
                         Circle()
                             .strokeBorder(self.color, lineWidth: 2)
                             .overlay {
@@ -100,12 +121,38 @@ struct PomodoroView: View {
                                     
                                 
                             }
-                        
-                        Text(timerDisplay)
-                            .font(.system(size: 60, weight: .semibold))
-                            .monospacedDigit()
-                            .foregroundColor(Color("1F2020"))
-                            .italic()
+                        ZStack {
+                            Picker("", selection: $selectedMinute) {
+                                ForEach(1..<61) { minute in
+                                    Text(String(format: "%02d:00", minute))
+                                        .font(.system(size: 38, weight: .semibold))
+                                        .monospacedDigit()
+                                        .foregroundColor(Color("1F2020"))
+                                        .italic()
+                                        .tag(minute)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .clipped()
+                            .onChange(of: selectedMinute) { oldValue, newValue in
+                                minuteValue = newValue
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    self.isTimePickerShow.toggle()
+                                    self.setStartAction()
+                                }
+                            }
+                            .opacity(self.isTimePickerShow ? 1: 0)
+                            
+                            Text(timerDisplay)
+                                .font(.system(size: 38, weight: .semibold))
+                                .monospacedDigit()
+                                .foregroundColor(Color("1F2020"))
+                                .italic()
+                                .onTapGesture {
+                                    self.isTimePickerShow.toggle()
+                                }
+                                .opacity(self.isTimePickerShow ? 0 : 1)
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -123,7 +170,8 @@ struct PomodoroView: View {
                 } else {
                     RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
                         if pomodoroState == .할일_완료 {
-                            self.selectedMinute = Config.POMODORO_REST_TIME_MINUTE
+                            self.selectedMinute = Int(Config.POMODORO_REST_TIME_MINUTE)
+                            self.minuteValue = Int(Config.POMODORO_REST_TIME_MINUTE)
                             self.setStartAction()
                         } else if pomodoroState == .휴식_완료 {
                             self.setStartAction()
@@ -188,6 +236,9 @@ struct PomodoroView: View {
         .onDisappear {
             secondTimer.upstream.connect().cancel()
         }
+        .onTapGesture {
+            self.endTextEditing()
+        }
     }
     
     func setStartAction() {
@@ -196,13 +247,9 @@ struct PomodoroView: View {
     }
     
     func getTimerForAngle() {
-        let startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (selectedMinute * Config.POMODORO_TIME_MINUTE))
+        let startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
         
-        self.selectedMinute = self.selectedMinute - 1
-        
-        print("getTimerForAngle = \(startAngle)")
-        
-        if self.selectedMinute < 0 {
+        if self.minuteValue < 0 {
             if pomodoroState == .할일_진행중 {
                 pomodoroState = .할일_완료
             } else if pomodoroState == .휴식_진행중 {
@@ -214,7 +261,9 @@ struct PomodoroView: View {
             return
         }
         
-        self.endPercent = startAngle
+        withAnimation(.easeInOut(duration: 0.2)) {
+            self.endPercent = startAngle
+        }
     }
 
     func getPomodoroStateImageDisplay() -> Image? {
@@ -278,12 +327,21 @@ struct PomodoroView: View {
     
     func getSecondTimeToMinuteTime() {
         var secondValue: Int = Int(Config.POMODORO_TIME_MINUTE) - Int(timerManager.timeRemaining)
-        let minuteValue: Int = Int(selectedMinute)
         
-        if secondValue == 60 {
+        print("getSecondTimeToMinuteTime secondValue = \(secondValue), minuteValue = \(minuteValue)")
+        
+        if secondValue == Int(Config.POMODORO_TIME_MINUTE) {
             secondValue = 0
+        } else if secondValue == Int(Config.POMODORO_TIME_MINUTE) - 1 {
+            self.minuteValue -= 1
+            
+            if self.minuteValue < 0 {
+                self.minuteValue = 0
+            }
         }
         
-        timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
+        DispatchQueue.main.async {
+            timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
+        }
     }
 }
