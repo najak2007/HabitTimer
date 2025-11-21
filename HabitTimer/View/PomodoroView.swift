@@ -194,9 +194,23 @@ struct PomodoroView: View {
         }
         .onReceive(minutePassed) { value in
             getSecondTimeToMinuteTime()
-            if value {
+#if true
+            if value == 0 {
                 getTimerForAngle()
+            } else {
+                self.endPercent -= 0.1
             }
+            
+            print("self.endPercent = \(self.endPercent)")
+#else
+            if value == 0 {
+                getTimerForAngle()
+            } else {
+                if value % 10 == 0 {
+                    self.endPercent -= 1
+                }
+            }
+#endif
         }
 #if __NOT_USE__
         .onReceive(secondTimer) { _ in
@@ -266,7 +280,7 @@ struct PomodoroView: View {
     func getTimerForAngle() {
         var startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
         
-        print("뽀모도로 시계 각도(startAngle) = \(startAngle)")
+        print("뽀모도로 시계 각도(startAngle) = \(startAngle), minuteValue = \(minuteValue)")
         
         if self.minuteValue <= 0 {
             if pomodoroState == .할일_진행중 {

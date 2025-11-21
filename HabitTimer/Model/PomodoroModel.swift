@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import RealmSwift
 
-var minutePassed = PassthroughSubject<Bool, Never>()
+var minutePassed = PassthroughSubject<Int, Never>()
 
 enum PomodoroState: Decodable, Encodable {
     case 초기화
