@@ -136,9 +136,12 @@ struct PomodoroView: View {
                             .clipped()
                             .onChange(of: selectedMinute) { oldValue, newValue in
                                 minuteValue = newValue
-                                withAnimation(.easeOut(duration: 0.2)) {
-                                    self.isTimePickerShow.toggle()
-                                    self.setStartAction()
+                                
+                                if pomodoroState != .할일_완료 {
+                                    withAnimation(.easeOut(duration: 0.2)) {
+                                        self.isTimePickerShow.toggle()
+                                        self.setStartAction()
+                                    }
                                 }
                             }
                             .opacity(self.isTimePickerShow ? 1: 0)
@@ -149,7 +152,11 @@ struct PomodoroView: View {
                                 .foregroundColor(Color("1F2020"))
                                 .italic()
                                 .onTapGesture {
-                                    self.isTimePickerShow.toggle()
+                                    if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 || pomodoroState == .초기화 {
+                                        self.isTimePickerShow.toggle()
+                                    } else {
+                                        toast = Toast(type: .info, title: "", message: "현재 상태에서는 시간을 변경할 수 없습니다.", position: .top)
+                                    }
                                 }
                                 .opacity(self.isTimePickerShow ? 0 : 1)
                         }
@@ -170,10 +177,13 @@ struct PomodoroView: View {
                 } else {
                     RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
                         if pomodoroState == .할일_완료 {
+#if false
                             self.selectedMinute = Int(Config.POMODORO_REST_TIME_MINUTE)
                             self.minuteValue = Int(Config.POMODORO_REST_TIME_MINUTE)
                             self.setStartAction()
+#endif
                         } else if pomodoroState == .휴식_완료 {
+
                             self.setStartAction()
                         }
                         setPomodoroStateChange()
@@ -220,12 +230,7 @@ struct PomodoroView: View {
 #endif
         .onAppear {
             
-            var remaining = index % Config.MAIN_STICKER_COUNT
-            
-            if remaining >= Config.MAIN_STICKER_COUNT {
-                remaining = 0
-            }
-            color = Color("STICKER_\(remaining)")
+            setToDoPlayingForColor()
             
             withAnimation(.easeOut(duration: 0.2)) {
                 self.setStartAction()
@@ -241,6 +246,18 @@ struct PomodoroView: View {
         }
     }
     
+    func setToDoPlayingForColor() {
+        var remaining = index % Config.MAIN_STICKER_COUNT
+        
+        if remaining >= Config.MAIN_STICKER_COUNT {
+            remaining = 0
+        }
+        
+        DispatchQueue.main.async {
+            color = Color("STICKER_\(remaining)")
+        }
+    }
+    
     func setStartAction() {
         getSecondTimeToMinuteTime()
         getTimerForAngle()
@@ -249,9 +266,28 @@ struct PomodoroView: View {
     func getTimerForAngle() {
         var startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
         
+        print("뽀모도로 시계 각도(startAngle) = \(startAngle)")
+        
         if self.minuteValue <= 0 {
             if pomodoroState == .할일_진행중 {
                 pomodoroState = .할일_완료
+                timerManager.pauseTimer()
+                
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.endPercent = 360
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    self.selectedMinute = Int(Config.POMODORO_REST_TIME_MINUTE)
+                    self.minuteValue = Int(Config.POMODORO_REST_TIME_MINUTE)
+                    self.setStartAction()
+                    DispatchQueue.main.async {
+                        color = Color(hex: "0xE3EAA7")
+                        self.endPercent = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(selectedMinute) * Config.POMODORO_TIME_MINUTE))
+                    }
+                }
+                
+                return
             } else if pomodoroState == .휴식_진행중 {
                 pomodoroState = .휴식_완료
             }

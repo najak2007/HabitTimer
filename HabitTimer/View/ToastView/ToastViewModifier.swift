@@ -17,7 +17,7 @@ struct ToastViewModifier: ViewModifier {
             .overlay(
                 ZStack {
                     mainToastView()
-                        .offset(y: -30)
+                        .offset(y: toast?.position == .bottom ? -30 : toast?.position == .top ? 40 : 0)
                 }.animation(.spring(), value: toast)
             )
             .onChange(of: toast) { oldValue, newValue in
@@ -28,16 +28,34 @@ struct ToastViewModifier: ViewModifier {
     @ViewBuilder func mainToastView() -> some View {
         if let toast = toast {
             VStack {
-                Spacer()
-                
-                ToastView(
-                    type: toast.type,
-                    title: toast.title,
-                    message: toast.message) {
-                        dismissToast()
-                    }
+                if toast.position == .bottom {
+                    Spacer()
+                    
+                    ToastView(
+                        type: toast.type,
+                        title: toast.title,
+                        message: toast.message) {
+                            dismissToast()
+                        }
+                } else if toast.position == .top {
+                    ToastView(
+                        type: toast.type,
+                        title: toast.title,
+                        message: toast.message) {
+                            dismissToast()
+                        }
+                    
+                    Spacer()
+                } else if toast.position == .center {
+                    ToastView(
+                        type: toast.type,
+                        title: toast.title,
+                        message: toast.message) {
+                            dismissToast()
+                        }
+                }
             }
-            .transition(.move(edge: .bottom))
+            .transition(.move(edge: toast.position == .bottom ? .bottom : toast.position == .top ? .top : .bottom))
         }
     }
     
