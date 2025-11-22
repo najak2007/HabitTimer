@@ -15,7 +15,6 @@ struct PomodoroView: View {
     private let secondTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
     @StateObject private var timerManager = TimerManager()
- //   @StateObject private var toDoListViewModel = ToDoListViewModel()
     
     @State private var themeColor: Color = Color("TimerSecond_B")
     
@@ -34,6 +33,7 @@ struct PomodoroView: View {
     @State private var toast: Toast? = nil
     @State private var isDoneButtonShow: Bool = false
     @State private var isTimePickerShow: Bool = false
+    @State private var isMenuShow: Bool = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -69,14 +69,20 @@ struct PomodoroView: View {
                     Spacer()
                     
                     Button(action: {
-                        toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                        if self.isDoneButtonShow {
+                            toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                            toast = Toast(type: .info, title: "", message: "저장되었습니다.", position: .top)
+                            self.isDoneButtonShow.toggle()
+                        } else {
+                            self.isMenuShow.toggle()
+                        }
+                        self.endTextEditing()
                     }, label: {
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: self.isDoneButtonShow ? "checkmark.circle.fill" : "ellipsis.circle.fill")
                             .resizable()
                             .frame(width: 35, height: 35)
                             .foregroundColor(Color("1F2020"))
                     })
-                    .opacity(isDoneButtonShow ? 1 : 0)
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
@@ -257,6 +263,26 @@ struct PomodoroView: View {
         }
         .onTapGesture {
             self.endTextEditing()
+        }
+        .overlay {
+            ZStack(alignment: .bottom) {
+                Color.black.opacity(0.1).opacity(self.isMenuShow ? 1 : 0)
+                    .onTapGesture {
+                        self.isMenuShow.toggle()
+                    }
+                
+                if self.isMenuShow {
+                    BottomSheetView($isMenuShow, height: 350) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
+                        VStack {
+//                            GameObjectiveView(selectedGameObjective: $selectedGameObjective, gamePlayMode: $gamePlayMode, savedScoreIndex: $savedScoreIndex, savedTimeIndex: $savedTimeIndex) { objectiveItem, objectiveValue in
+//                                self.selectedGameObjective = objectiveItem
+//                                self.isGameObjectiveShow.toggle()
+//
+//                            }
+                        }
+                    }
+                }
+            }
         }
     }
     
