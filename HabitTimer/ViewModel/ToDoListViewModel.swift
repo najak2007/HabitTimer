@@ -14,6 +14,9 @@ class ToDoListViewModel: ObservableObject {
     
     @Published var toDoList: [ToDoListData] = []
     
+    @Published var selectedIndex: Int = 0
+    @Published var selectedToDoListData: ToDoListData = ToDoListData()
+    
     init() {
         realm = RealmManager.shared.realm
         fetchToDoList()
@@ -27,7 +30,6 @@ class ToDoListViewModel: ObservableObject {
     
     func addToDoList(_ toDoListData: ToDoListData) {
         guard let realm = realm else { return }
-        
         do {
             try realm.write {
                 realm.add(toDoListData)
@@ -40,12 +42,25 @@ class ToDoListViewModel: ObservableObject {
     
     func deleteToDoList(_ toDoListData: ToDoListData) {
         guard let realm = realm else { return }
-        
         do {
             try realm.write {
                 realm.delete(toDoListData)
                 fetchToDoList()
             }
+        } catch {
+            
+        }
+    }
+    
+    func updateToDoMessageText(toDoListData: ToDoListData, messageText: String) {
+        guard let realm = realm else { return }
+        
+        do {
+            try realm.write {
+                toDoListData.messageText = messageText
+                fetchToDoList()
+            }
+            
         } catch {
             
         }

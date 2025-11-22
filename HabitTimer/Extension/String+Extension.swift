@@ -26,4 +26,8 @@ extension String {
         }
         return false
     }
+    
+    var newLineRemoved: String {
+        return replacingOccurrences(of: "\n", with: " ")
+    }
 }
