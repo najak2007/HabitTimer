@@ -9,7 +9,9 @@ import Foundation
 import Combine
 import RealmSwift
 
-var minutePassed = PassthroughSubject<Bool, Never>()
+var minutePassed = PassthroughSubject<Int, Never>()
+
+var pomodoroStartMode = PassthroughSubject<Bool, Never>()
 
 enum PomodoroState: Decodable, Encodable {
     case 초기화

@@ -22,9 +22,9 @@ class Config {
     
     static let TODOLIST_ROW_HEIGHT: CGFloat = 340
     
-    static let POMODORO_WORK_TIME_MINUTE: Int = 1 //25
+    static let POMODORO_WORK_TIME_MINUTE: Int = 3 //25
     
-    static let POMODORO_REST_TIME_MINUTE: Double = 5
+    static let POMODORO_REST_TIME_MINUTE: Int = 5
     
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
     
@@ -36,4 +36,6 @@ class Config {
     static let INPUT_TEXT_FIELD_MARGIN: CGFloat = 25
     
     static let MAIN_STICKER_COUNT: Int = 5
+    
+    static let TIME_CIRCLE_ROUND_WIDTH: CGFloat = 8.0
 }

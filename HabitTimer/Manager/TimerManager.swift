@@ -21,10 +21,8 @@ class TimerManager: ObservableObject {
                 self.timeRemaining += 1
                 if self.timeRemaining >= Config.POMODORO_TIME_MINUTE {
                     self.timeRemaining = 0
-                    minutePassed.send(true)     // Void로 하면 .send() 로 해도 된다.
-                } else {
-                    minutePassed.send(false)
                 }
+                minutePassed.send(Int(self.timeRemaining))
             }
             isPaused = false
         }
