@@ -11,6 +11,8 @@ import RealmSwift
 
 var minutePassed = PassthroughSubject<Int, Never>()
 
+var pomodoroStartMode = PassthroughSubject<Bool, Never>()
+
 enum PomodoroState: Decodable, Encodable {
     case 초기화
     case 할일_진행중
