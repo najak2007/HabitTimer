@@ -11,6 +11,11 @@ import RealmSwift
 
 var minutePassed = PassthroughSubject<Int, Never>()
 
+var pomodoroStartMode = PassthroughSubject<Bool, Never>()
+
+var focusTimeSetting = PassthroughSubject<Int, Never>()
+var breakTimeSetting = PassthroughSubject<Int, Never>()
+
 enum PomodoroState: Decodable, Encodable {
     case 초기화
     case 할일_진행중
@@ -30,7 +35,7 @@ final class ToDoListData: Object, Comparable {
     @objc dynamic var isRepeat: Bool = false
     @objc dynamic var placeName: String = ""
     @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
-    @objc dynamic var remainingTime: Double = 0
+    @objc dynamic var remainingTime: Int = 0
     
     static func < (lhs: ToDoListData, rhs: ToDoListData) -> Bool {
         return lhs.date < rhs.date

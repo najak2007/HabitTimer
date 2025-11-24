@@ -15,7 +15,6 @@ struct PomodoroView: View {
     private let secondTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
     @StateObject private var timerManager = TimerManager()
- //   @StateObject private var toDoListViewModel = ToDoListViewModel()
     
     @State private var themeColor: Color = Color("TimerSecond_B")
     
@@ -29,11 +28,15 @@ struct PomodoroView: View {
     @State private var elapsedTime: Double = 0.0
     @State private var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
     @State private var minuteValue: Int = Config.POMODORO_WORK_TIME_MINUTE
+    @State private var minuteBreakValue: Int = Config.POMODORO_REST_TIME_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
     @State private var timerDisplay: String = "00:00"
     @State private var toast: Toast? = nil
     @State private var isDoneButtonShow: Bool = false
     @State private var isTimePickerShow: Bool = false
+    @State private var isMenuShow: Bool = false
+    @State private var isAutoStart: Bool = false       // 자동으로 휴식 설정
+    @State private var isFullScreen: Bool = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -69,14 +72,20 @@ struct PomodoroView: View {
                     Spacer()
                     
                     Button(action: {
-                        toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                        if self.isDoneButtonShow {
+                            toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                            toast = Toast(type: .info, title: "", message: "저장되었습니다.", position: .top)
+                            self.isDoneButtonShow.toggle()
+                        } else {
+                            self.isMenuShow.toggle()
+                        }
+                        self.endTextEditing()
                     }, label: {
-                        Image(systemName: "checkmark.circle.fill")
+                        Image(systemName: self.isDoneButtonShow ? "checkmark.circle.fill" : "ellipsis.circle.fill")
                             .resizable()
                             .frame(width: 35, height: 35)
                             .foregroundColor(Color("1F2020"))
                     })
-                    .opacity(isDoneButtonShow ? 1 : 0)
                 }
                 .frame(height: Config.NAVIGATION_HEIGHT)
                 .padding(.horizontal, 20)
@@ -110,14 +119,14 @@ struct PomodoroView: View {
                                alignment: .center)
 
                         Circle()
-                            .strokeBorder(self.color, lineWidth: 2)
+                            .strokeBorder(self.color, lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH / 2)
                             .overlay {
                                 Circle()
-                                    .trim(from: 0.0, to: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE)
-                                    .stroke(themeColor, style: StrokeStyle(lineWidth: 4.0, lineCap: .round, lineJoin: .round))
+                                    .trim(from: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE > 0.016 ? (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) - 0.000008 : 0.0, to: (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) == 0 ? 0.0 : (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) + 0.008)
+                                    .stroke(themeColor, style: StrokeStyle(lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH, lineCap: .round, lineJoin: .round))
                                     .rotationEffect(Angle(degrees: 270))
                                     .animation(.smooth(duration: timerManager.timeRemaining == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
-                                    .padding(2)
+                                    .padding(Config.TIME_CIRCLE_ROUND_WIDTH / 4)
                                     
                                 
                             }
@@ -149,6 +158,7 @@ struct PomodoroView: View {
                             Text(timerDisplay)
                                 .font(.system(size: 38, weight: .semibold))
                                 .monospacedDigit()
+                                .background(.clear)
                                 .foregroundColor(Color("1F2020"))
                                 .italic()
                                 .onTapGesture {
@@ -159,6 +169,7 @@ struct PomodoroView: View {
                                     }
                                 }
                                 .opacity(self.isTimePickerShow ? 0 : 1)
+                            
                         }
                     }
                 }
@@ -258,6 +269,34 @@ struct PomodoroView: View {
         .onTapGesture {
             self.endTextEditing()
         }
+        .overlay {
+            ZStack(alignment: .bottom) {
+                Color.black.opacity(0.1).opacity(self.isMenuShow ? 1 : 0)
+                    .onTapGesture {
+                        self.isMenuShow.toggle()
+                    }
+                
+                if self.isMenuShow {
+                    BottomSheetView($isMenuShow, height: 450) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
+                        VStack {
+                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAutoStart: $isAutoStart, isFullScreen: $isFullScreen)
+                        }
+                    }
+                }
+            }
+        }
+        .onReceive(focusTimeSetting) { focusTimeIndex in
+            print("focusTimeIndex = \(focusTimeIndex)")
+        }
+        .onReceive(breakTimeSetting) { breakTimeIndex in
+            print("breakTimeIndex = \(breakTimeIndex)")
+        }
+        .onChange(of: isAutoStart) { oldValue, newValue in
+            
+        }
+        .onChange(of: isFullScreen) { oldValue, newValue in
+            
+        }
     }
     
     func setToDoPlayingForColor() {
@@ -292,8 +331,8 @@ struct PomodoroView: View {
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self.selectedMinute = Int(Config.POMODORO_REST_TIME_MINUTE)
-                    self.minuteValue = Int(Config.POMODORO_REST_TIME_MINUTE)
+                    self.selectedMinute = Config.POMODORO_REST_TIME_MINUTE
+                    self.minuteValue = Config.POMODORO_REST_TIME_MINUTE
                     self.setStartAction()
                     DispatchQueue.main.async {
                         color = Color(hex: "0xE3EAA7")
