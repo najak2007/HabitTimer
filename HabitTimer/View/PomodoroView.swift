@@ -36,6 +36,7 @@ struct PomodoroView: View {
     @State private var isTimePickerShow: Bool = false
     @State private var isMenuShow: Bool = false
     @State private var isAutoStart: Bool = false       // 자동으로 휴식 설정
+    @State private var isRepeat: Bool = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -274,13 +275,25 @@ struct PomodoroView: View {
                     }
                 
                 if self.isMenuShow {
-                    BottomSheetView($isMenuShow, height: 350) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
+                    BottomSheetView($isMenuShow, height: 450) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
                         VStack {
-                            PomodoroSettingView(focusTime: $minuteValue, breakTime: $minuteBreakValue, isAutoStart: $isAutoStart)
+                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAutoStart: $isAutoStart, isRepeat: $isRepeat)
                         }
                     }
                 }
             }
+        }
+        .onReceive(focusTimeSetting) { focusTimeIndex in
+            print("focusTimeIndex = \(focusTimeIndex)")
+        }
+        .onReceive(breakTimeSetting) { breakTimeIndex in
+            print("breakTimeIndex = \(breakTimeIndex)")
+        }
+        .onChange(of: isAutoStart) { oldValue, newValue in
+            
+        }
+        .onChange(of: isRepeat) { oldValue, newValue in
+            
         }
     }
     
