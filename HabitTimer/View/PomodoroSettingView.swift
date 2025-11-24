@@ -108,12 +108,12 @@ struct PomodoroSettingView: View {
                 }
             }
             
-            Section(header: PomodoroListHeaderView(headerText: "시작 설정", showAlignments: .좌측정렬)) {
+            Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
                 Button(action: {
                     
                 }, label: {
                     HStack {
-                        Text("자동으로 휴식 시작")
+                        Text("알람 설정")
                             .font(.custom("GmarketSansTTFMedium", size: 20))
                             .foregroundColor(Color("1F2020"))
                             .multilineTextAlignment(.leading)
