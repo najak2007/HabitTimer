@@ -36,7 +36,7 @@ struct PomodoroView: View {
     @State private var isTimePickerShow: Bool = false
     @State private var isMenuShow: Bool = false
     @State private var isAutoStart: Bool = false       // 자동으로 휴식 설정
-    @State private var isRepeat: Bool = false
+    @State private var isFullScreen: Bool = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -158,6 +158,7 @@ struct PomodoroView: View {
                             Text(timerDisplay)
                                 .font(.system(size: 38, weight: .semibold))
                                 .monospacedDigit()
+                                .background(.clear)
                                 .foregroundColor(Color("1F2020"))
                                 .italic()
                                 .onTapGesture {
@@ -168,6 +169,7 @@ struct PomodoroView: View {
                                     }
                                 }
                                 .opacity(self.isTimePickerShow ? 0 : 1)
+                            
                         }
                     }
                 }
@@ -277,7 +279,7 @@ struct PomodoroView: View {
                 if self.isMenuShow {
                     BottomSheetView($isMenuShow, height: 450) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
                         VStack {
-                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAutoStart: $isAutoStart, isRepeat: $isRepeat)
+                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAutoStart: $isAutoStart, isFullScreen: $isFullScreen)
                         }
                     }
                 }
@@ -292,7 +294,7 @@ struct PomodoroView: View {
         .onChange(of: isAutoStart) { oldValue, newValue in
             
         }
-        .onChange(of: isRepeat) { oldValue, newValue in
+        .onChange(of: isFullScreen) { oldValue, newValue in
             
         }
     }

@@ -16,7 +16,7 @@ struct PomodoroSettingView: View {
     @State private var breakTimeIndex: Int = 0
     
     @Binding var isAutoStart: Bool
-    @Binding var isRepeat: Bool
+    @Binding var isFullScreen: Bool
     
     var body: some View {
         List {
@@ -113,7 +113,7 @@ struct PomodoroSettingView: View {
                     
                 }, label: {
                     HStack {
-                        Text("알람 설정")
+                        Text("알림 설정")
                             .font(.custom("GmarketSansTTFMedium", size: 20))
                             .foregroundColor(Color("1F2020"))
                             .multilineTextAlignment(.leading)
@@ -132,7 +132,7 @@ struct PomodoroSettingView: View {
                     
                 }, label: {
                     HStack {
-                        Text("집중 모드 > 휴식 모드 반복 설정")
+                        Text("전체 화면")
                             .font(.custom("GmarketSansTTFMedium", size: 20))
                             .foregroundColor(Color("1F2020"))
                             .multilineTextAlignment(.leading)
@@ -140,7 +140,7 @@ struct PomodoroSettingView: View {
                             
                         Spacer()
                         
-                        Toggle(isOn: $isRepeat) {
+                        Toggle(isOn: $isFullScreen) {
                             Label("", systemImage: "flag.fill")
                         }
                         .labelsHidden()
