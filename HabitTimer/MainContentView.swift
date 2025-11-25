@@ -26,11 +26,14 @@ struct PostitListView: View {
     @State private var isAddToDoListShow: Bool = false
     @State private var isDeleteAction: Bool = false
     @State private var isDetailShow: Bool = false
+    @State private var isToDoListHistoryView: Bool = false
+    @State private var isSiriRegister: Bool = false
     @State private var size: CGSize = .zero
     @State private var rowHeight: CGFloat = Config.TODOLIST_ROW_HEIGHT
     @State private var toast: Toast? = nil
     @State private var messageTextEditorID: String = ""
     @State private var textWidth: CGFloat = 0
+    @State private var date = Date()
     
     @Namespace private var animation
     
@@ -53,7 +56,40 @@ struct PostitListView: View {
                         ZStack {
                             Image(getImageName(index: index))
                                 .resizable()
-
+                            
+                            
+                            VStack(alignment: .trailing) {
+                                HStack(spacing: 15) {
+                                    Spacer()
+                                    
+                                    Image(systemName: "siri")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(.black)
+                                        .onTapGesture {
+                                            self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
+                                            self.toDoListViewModel.selectedIndex = index
+                                            self.isSiriRegister.toggle()
+                                        }
+                                        .frame(width: 40, height: 40)
+                                    
+                                    Image(systemName: "ellipsis.circle")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(.black)
+                                        .onTapGesture {
+                                            self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
+                                            self.toDoListViewModel.selectedIndex = index
+                                            self.isToDoListHistoryView.toggle()
+                                        }
+                                        .frame(width: 40, height: 40)
+                                        .padding(.trailing, 62)
+                                }
+                                .padding(.top, 55)
+                                Spacer()
+                            }
+                            
+                            
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
                                 .foregroundColor(.black)
@@ -66,17 +102,9 @@ struct PostitListView: View {
                         .listRowBackground(Color.white)
                         .listRowInsets(EdgeInsets())
                         .onTapGesture {
-#if true
                             self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
                             self.toDoListViewModel.selectedIndex = index
                             self.isDetailShow.toggle()
-#else
-                            if editMode == .active {
-                                messageTextEditorID = toDoListViewModel.toDoList[index].id
-                            } else {
-                                
-                            }
-#endif
                         }
                         .id(toDoListViewModel.toDoList[index].id)
                     }
@@ -115,11 +143,41 @@ struct PostitListView: View {
                         }
                     }
                     
+                    ToolbarItem(placement: .title) {
+                        HStack(spacing: 4) {
+                            Text(date.yyMMddDot)
+                                .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
+                                .foregroundColor(Color("1F2020"))
+                                .overlay {
+                                    DatePicker(selection: $date, displayedComponents: [.date]) {
+                                        
+                                    }
+                                    .labelsHidden()
+                                    .colorMultiply(.clear)
+                                    .datePickerStyle(.compact)
+                                    .environment(\.locale, Locale(identifier: String(Locale.preferredLanguages[0])))
+                                }
+                                .onChange(of: date) { oldValue, newValue in
+                                    bind(oldValue != newValue)
+                                }
+                            
+                            Image(systemName: "arrowtriangle.down.circle")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(Color("1F2020"))
+                        }
+                    }
+                    
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        EditButton()
-                            .foregroundColor(.black)
+                        if self.toDoListViewModel.toDoList.isEmpty {
+                            EmptyView()
+                        } else {
+                            EditButton()
+                                .foregroundColor(.black)
+                        }
                     }
                 }
+                .toolbarBackground(.hidden, for: .navigationBar)
                 .simultaneousGesture(DragGesture().onChanged({ _ in
                     if self.isAddToDoListShow {
                         withAnimation(.easeOut(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
@@ -190,6 +248,9 @@ struct PostitListView: View {
             transaction.disablesAnimations = true
             
         }
+        .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
+            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+        })
         .toastView(toast: $toast)
 
         .ignoresSafeArea()
@@ -214,6 +275,10 @@ struct PostitListView: View {
         
         self.isDeleteAction = true
         toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex])
+    }
+    
+    func bind(_ isLoading: Bool = false) {
+        print("bind = \(isLoading)")
     }
 }
 

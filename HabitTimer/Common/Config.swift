@@ -14,6 +14,8 @@ enum InputTypeError {
 
 class Config {
     static let NAVIGATION_HEIGHT: CGFloat = 80
+    static let MAIN_HEADER_TITLE_FONT_SIZE: CGFloat = 20
+    
     static let INPUT_VIEW_HEADER_FONT_SIZE: CGFloat = 14
     
     static let POMODORO_TIME_MINUTE: Double = 60
@@ -24,7 +26,7 @@ class Config {
     
     static let POMODORO_WORK_TIME_MINUTE: Int = 3 //25
     
-    static let POMODORO_REST_TIME_MINUTE: Int = 5
+    static let POMODORO_BREAK_TIME_MINUTE: Int = 5
     
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
     

@@ -22,10 +22,17 @@ class ToDoListViewModel: ObservableObject {
         fetchToDoList()
     }
     
-    func fetchToDoList() {
+    func fetchToDoList(_ date: Date = Date()) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
-        toDoList = Array(results)
+        
+        if date.yyyyMMdd == Date().yyyyMMdd {
+            toDoList = Array(results)
+            return
+        }
+        
+        toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
+        
     }
     
     func addToDoList(_ toDoListData: ToDoListData) {
@@ -65,4 +72,5 @@ class ToDoListViewModel: ObservableObject {
             
         }
     }
+    
 }
