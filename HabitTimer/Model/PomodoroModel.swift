@@ -16,7 +16,7 @@ var pomodoroStartMode = PassthroughSubject<Bool, Never>()
 var focusTimeSetting = PassthroughSubject<Int, Never>()
 var breakTimeSetting = PassthroughSubject<Int, Never>()
 
-enum PomodoroState: Decodable, Encodable {
+enum PomodoroState: Int, Decodable, Encodable {
     case 초기화
     case 할일_진행중
     case 할일_일시정지
@@ -36,6 +36,14 @@ class ToDoListCompletion: Object, Comparable {
     
     static func < (lhs: ToDoListCompletion, rhs: ToDoListCompletion) -> Bool {
         return lhs.date < rhs.date
+    }
+    
+    func updateCompletionToDoData(isDone: Bool, pomodoroState: PomodoroState, selectedMinute: Int, remainingTime: Int, breakMinute: Int) {
+        self.isDone = isDone
+        self.pomodoroState = pomodoroState
+        self.selectedMinute = selectedMinute
+        self.remainingMinute = remainingTime
+        self.breakMinute = breakMinute
     }
 }
 
