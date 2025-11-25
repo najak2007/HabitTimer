@@ -27,6 +27,7 @@ struct PostitListView: View {
     @State private var isDeleteAction: Bool = false
     @State private var isDetailShow: Bool = false
     @State private var isToDoListHistoryView: Bool = false
+    @State private var isSiriRegister: Bool = false
     @State private var size: CGSize = .zero
     @State private var rowHeight: CGFloat = Config.TODOLIST_ROW_HEIGHT
     @State private var toast: Toast? = nil
@@ -58,8 +59,19 @@ struct PostitListView: View {
                             
                             
                             VStack(alignment: .trailing) {
-                                HStack {
+                                HStack(spacing: 15) {
                                     Spacer()
+                                    
+                                    Image(systemName: "siri")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(.black)
+                                        .onTapGesture {
+                                            self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
+                                            self.toDoListViewModel.selectedIndex = index
+                                            self.isSiriRegister.toggle()
+                                        }
+                                        .frame(width: 40, height: 40)
                                     
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
