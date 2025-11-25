@@ -30,4 +30,18 @@ extension String {
     var newLineRemoved: String {
         return replacingOccurrences(of: "\n", with: " ")
     }
+    
+    var divisionNewLineFirst: String {
+        guard let firstStr =  components(separatedBy: "\n").first else {
+            return ""
+        }
+        return firstStr
+    }
+    
+    var divisionNewLineLast: String {
+        guard let lastStr = components(separatedBy: "\n").last else {
+            return ""
+        }
+        return lastStr
+    }
 }
