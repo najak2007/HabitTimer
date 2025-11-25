@@ -62,6 +62,7 @@ struct PostitListView: View {
                                 HStack(spacing: 15) {
                                     Spacer()
                                     
+#if __NOT_USE__
                                     Image(systemName: "siri")
                                         .resizable()
                                         .frame(width: 25, height: 25)
@@ -72,7 +73,7 @@ struct PostitListView: View {
                                             self.isSiriRegister.toggle()
                                         }
                                         .frame(width: 40, height: 40)
-                                    
+#endif
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)

@@ -73,4 +73,17 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
+    func addCompletionToDoItem(toDoListData: ToDoListData, toDoListCompletion: ToDoListCompletion) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        guard let updateToDoData = Array(results).filter({$0.id == toDoListData.id}).first else { return }
+        
+        do {
+            try realm.write {
+                updateToDoData.toDoListItems.append(toDoListCompletion)
+                fetchToDoList()
+            }
+        }catch {
+        }
+    }
 }

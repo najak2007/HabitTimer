@@ -391,6 +391,8 @@ struct PomodoroView: View {
                 pomodoroState = .할일_완료
                 timerManager.pauseTimer()
                 
+            
+                
                 withAnimation(.easeInOut(duration: 0.2)) {
                     self.endPercent = 360
                 }
@@ -422,6 +424,19 @@ struct PomodoroView: View {
         }
     }
 
+    func toDoListFinished() {
+        let toDoListCompletion: ToDoListCompletion = ToDoListCompletion()
+        toDoListCompletion.updateCompletionToDoData(
+            isDone: true,
+            pomodoroState: pomodoroState,
+            selectedMinute: self.selectedMinute,
+            remainingTime : 0,
+            breakMinute: pomodoroState == .할일_완료 ? 0 : self.selectedMinute
+        )
+            
+        toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, toDoListCompletion: toDoListCompletion)
+    }
+    
     func getPomodoroStateImageDisplay() -> Image? {
         switch pomodoroState {
         case .초기화, .휴식_완료, .할일_완료:
