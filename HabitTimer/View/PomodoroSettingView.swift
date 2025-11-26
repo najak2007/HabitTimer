@@ -15,8 +15,10 @@ struct PomodoroSettingView: View {
     @State private var focusTimeIndex: Int = 0
     @State private var breakTimeIndex: Int = 0
     
-    @Binding var isAutoStart: Bool
+    @Binding var isAlarmStatus: Bool
     @Binding var isFullScreen: Bool
+    
+    @State private var toast: Toast? = nil
     
     var body: some View {
         List {
@@ -62,6 +64,7 @@ struct PomodoroSettingView: View {
                     if focusTime > 0 {
                         focusTimeIndex = focusTime - 1
                     }
+                    self.isAlarmStatus = UserDefaults.standard.bool(forKey: Config.NOTIFICATION_SETTING_ID)
                 }
                 
                 Button(action: {
@@ -121,10 +124,22 @@ struct PomodoroSettingView: View {
                             
                         Spacer()
                         
-                        Toggle(isOn: $isAutoStart) {
+                        Toggle(isOn: $isAlarmStatus) {
                             Label("", systemImage: "flag.fill")
                         }
                         .labelsHidden()
+                        .onChange(of: isAlarmStatus) { oldValue, newValue in
+                            if oldValue == false, newValue == true {
+                                NotificationManager.instance.getNotificationSettings { authStatus in
+                                    if authStatus.authorizationStatus != .authorized {
+                                        self.isAlarmStatus = false
+                                        DispatchQueue.main.async {
+                                            toast = Toast(type: .info, title: "", message: "알림 권한 허용 필요 (설정 > 알림 허용)", position: .center)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 })
                 
@@ -148,6 +163,7 @@ struct PomodoroSettingView: View {
                 })
             }
         }
+        .toastView(toast: $toast)
         .environment(\.defaultMinListRowHeight, 80)
         .scrollDisabled(true)
     }

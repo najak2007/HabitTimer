@@ -37,6 +37,8 @@ struct PostitListView: View {
     
     @Namespace private var animation
     
+    let notiManager = NotificationManager.instance
+    
     let coloredNavAppearance = UINavigationBarAppearance()
     
     init() {
@@ -46,6 +48,8 @@ struct PostitListView: View {
         coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         UINavigationBar.appearance().standardAppearance = coloredNavAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = coloredNavAppearance
+        
+        notiManager.requestAuthorization()
     }
     
     var body: some View {

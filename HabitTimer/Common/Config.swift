@@ -12,6 +12,8 @@ enum InputTypeError {
     case 할일_글자수_초과
 }
 
+
+
 class Config {
     static let NAVIGATION_HEIGHT: CGFloat = 80
     static let MAIN_HEADER_TITLE_FONT_SIZE: CGFloat = 20
@@ -40,4 +42,6 @@ class Config {
     static let MAIN_STICKER_COUNT: Int = 5
     
     static let TIME_CIRCLE_ROUND_WIDTH: CGFloat = 8.0
+    
+    static let NOTIFICATION_SETTING_ID: String = "habitTimer.notification.setting"
 }
