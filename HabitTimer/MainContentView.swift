@@ -265,7 +265,9 @@ struct PostitListView: View {
             
         }
         .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
-            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+//            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+            
+            ToDoDataResultListView()
         })
         .toastView(toast: $toast)
 
