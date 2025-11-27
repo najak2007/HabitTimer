@@ -150,7 +150,7 @@ struct PostitListView: View {
                     
                     ToolbarItem(placement: .title) {
                         HStack(spacing: 4) {
-                            Text(date.yyMMddDot)
+                            Text(date.yyMMddDotE)
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
                                 .foregroundColor(Color("1F2020"))
                                 .onChange(of: date) { oldValue, newValue in
@@ -265,7 +265,9 @@ struct PostitListView: View {
             
         }
         .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
-            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+//            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+            
+            ToDoDataResultListView()
         })
         .toastView(toast: $toast)
 
