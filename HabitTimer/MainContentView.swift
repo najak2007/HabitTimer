@@ -150,7 +150,7 @@ struct PostitListView: View {
                     
                     ToolbarItem(placement: .title) {
                         HStack(spacing: 4) {
-                            Text(date.yyMMddDot)
+                            Text(date.yyMMddDotE)
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
                                 .foregroundColor(Color("1F2020"))
                                 .onChange(of: date) { oldValue, newValue in

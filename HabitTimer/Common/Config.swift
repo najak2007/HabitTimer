@@ -45,4 +45,6 @@ class Config {
     
     static let NOTIFICATION_SETTING_ID: String = "habitTimer.notification.setting"
     static let TIMEREMAING_SAVE_ID: String = "habitTimer.timerRemaining.save"
+    
+    static let WEEKDAY_TITLE: [String] = ["일", "월", "화", "수", "목", "금", "토"]
 }

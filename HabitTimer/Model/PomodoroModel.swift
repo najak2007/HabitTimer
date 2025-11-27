@@ -28,6 +28,7 @@ enum PomodoroState: Int, Decodable, Encodable {
 
 class ToDoListCompletion: Object, Comparable {
     @objc dynamic var date: Date = Date()
+    @objc dynamic var dateForWeek: String = Date().weekDay
     @objc dynamic var isDone: Bool = false
     dynamic var pomodoroState: PomodoroState = .초기화
     @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
@@ -52,6 +53,7 @@ final class ToDoListData: Object, Comparable {
     @objc dynamic var isFromYou: Bool = false
     @objc dynamic var messageText: String = ""
     @objc dynamic var createDate: Date = Date()
+    @objc dynamic var createDateForWeek: String =  Date().weekDay
     
 #if __NOT_USE__
     @objc dynamic var isDone: Bool = false
