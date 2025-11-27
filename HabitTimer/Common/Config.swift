@@ -44,4 +44,5 @@ class Config {
     static let TIME_CIRCLE_ROUND_WIDTH: CGFloat = 8.0
     
     static let NOTIFICATION_SETTING_ID: String = "habitTimer.notification.setting"
+    static let TIMEREMAING_SAVE_ID: String = "habitTimer.timerRemaining.save"
 }
