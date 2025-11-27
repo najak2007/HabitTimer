@@ -39,6 +39,7 @@ struct PomodoroView: View {
     @State private var isAlarmStatus: Bool = false       // 알림 모드 설정
     @State private var isFullScreen: Bool = false
     @State private var timeRemaining: Double = Double(Config.POMODORO_WORK_TIME_MINUTE) * Config.POMODORO_TIME_MINUTE
+    @State private var pomodoroScenePhase: ScenePhase? = nil
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -341,7 +342,7 @@ struct PomodoroView: View {
                     }
                 
                 if self.isMenuShow {
-                    BottomSheetView($isMenuShow, height: 450) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
+                    BottomSheetView($isMenuShow, height: 450) {
                         VStack {
                             PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAlarmStatus: $isAlarmStatus, isFullScreen: $isFullScreen)
                         }
@@ -362,6 +363,55 @@ struct PomodoroView: View {
         }
         .onChange(of: scenePhase) { oldValue, newValue in
             print("oldValue = \(oldValue), newValue = \(newValue)")
+
+            if oldValue == .inactive, newValue == .background {
+                if (pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중), self.timeRemaining >  2 {
+                    setFinishingTime()
+                }
+            } else if oldValue == .background, newValue == .inactive {
+                guard let savedDate = UserDefaults.standard.object(forKey: Config.TIMEREMAING_SAVE_ID) as? Date else {
+                    return
+                }
+                setDateComponents(savedDate)
+            }
+        }
+    }
+    
+    func setDateComponents(_ savedDate: Date) {
+        let currentDate = Date()
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.second], from: currentDate, to: savedDate)
+        
+        if let seconds = components.second {
+            if seconds > 0 {
+                let minute = seconds / Int(Config.POMODORO_TIME_MINUTE)
+                self.minuteValue = minute
+                
+                let newSecond = seconds.remainderReportingOverflow(dividingBy: Int(Config.POMODORO_TIME_MINUTE)).partialValue
+                timerManager.timeRemaining = TimeInterval(Int(Config.POMODORO_TIME_MINUTE) - newSecond)
+                
+                print("new timerManager.timeRemaining = \(timerManager.timeRemaining), minuteValue = \(self.minuteValue), timeRemaining = \(self.timeRemaining), newSecond = \(newSecond)")
+                
+            } else {
+                self.minuteValue = 0
+                timerManager.timeRemaining = 0
+                timerManager.resetTimer()
+            }
+            getSecondTimeToMinuteTime()
+        }
+    }
+    
+    func setFinishingTime() {
+        let currentDate = Date()
+        
+        var dateComponents = DateComponents()
+        dateComponents.second = Int(self.timeRemaining)
+        
+        let calendar = Calendar.current
+        
+        if let newDate = calendar.date(byAdding: dateComponents, to: currentDate) {
+            UserDefaults.standard.set(newDate, forKey: Config.TIMEREMAING_SAVE_ID)
         }
     }
     
@@ -369,8 +419,8 @@ struct PomodoroView: View {
         self.selectedMinute = toDoListData.selectedMinute
         self.minuteValue = self.selectedMinute
         self.minuteBreakValue = toDoListData.breakMinute
-
         
+        UserDefaults.standard.removeObject(forKey: Config.TIMEREMAING_SAVE_ID)
     }
     
     func setToDoPlayingForColor() {

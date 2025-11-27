@@ -153,15 +153,6 @@ struct PostitListView: View {
                             Text(date.yyMMddDot)
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
                                 .foregroundColor(Color("1F2020"))
-                                .overlay {
-                                    DatePicker(selection: $date, displayedComponents: [.date]) {
-                                        
-                                    }
-                                    .labelsHidden()
-                                    .colorMultiply(.clear)
-                                    .datePickerStyle(.compact)
-                                    .environment(\.locale, Locale(identifier: String(Locale.preferredLanguages[0])))
-                                }
                                 .onChange(of: date) { oldValue, newValue in
                                     bind(oldValue != newValue)
                                 }
@@ -170,6 +161,15 @@ struct PostitListView: View {
                                 .resizable()
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(Color("1F2020"))
+                        }
+                        .overlay {
+                            DatePicker(selection: $date, displayedComponents: [.date]) {
+                                
+                            }
+                            .labelsHidden()
+                            .colorMultiply(.clear)
+                            .datePickerStyle(.compact)
+                            .environment(\.locale, Locale(identifier: String(Locale.preferredLanguages[0])))
                         }
                     }
                     
@@ -196,7 +196,18 @@ struct PostitListView: View {
                 .background(.white)
                 .contentMargins(.horizontal, 0)
                 .padding(.top, -34)
-                
+                .overlay {
+                    VStack(alignment: .center) {
+                        Spacer()
+                    
+                        Image("icon_empty")
+                            .resizable()
+                            .frame(width: 280, height: 187)
+                    
+                        Spacer()
+                    }
+                    .opacity(self.toDoListViewModel.toDoList.isEmpty ? 1 : 0)
+                }
                 .overlay {
                     VStack(spacing: 10) {
                         Spacer()
@@ -283,7 +294,7 @@ struct PostitListView: View {
     }
     
     func bind(_ isLoading: Bool = false) {
-        print("bind = \(isLoading)")
+        toDoListViewModel.fetchToDoList(date)
     }
 }
 
