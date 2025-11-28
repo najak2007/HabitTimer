@@ -29,7 +29,6 @@ struct ToDoDataResultListView: View {
                 
                 Spacer()
             }
-            .navigationTitle("완료한 일")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 trailing: Button(action: {
@@ -41,8 +40,17 @@ struct ToDoDataResultListView: View {
                         .foregroundColor(Color("1F2020"))
                 })
             )
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text("완료한 일")
+                            .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
+                            .foregroundColor(Color("1F2020"))
+                        
+                    }
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
-
     }
-    
 }
