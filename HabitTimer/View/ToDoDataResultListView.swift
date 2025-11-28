@@ -13,6 +13,9 @@ struct ToDoDataResultListView: View {
     @Environment(\.dismiss) var dismiss
     @State private var weekDayTableIndex: Int = 0
     
+    var toDoListViewModel: ToDoListViewModel
+    
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 40) {
@@ -23,9 +26,16 @@ struct ToDoDataResultListView: View {
                 }
                 .pickerStyle(.segmented)
                 .tint(Color("1F2020"))
-                .onAppear {
-                    weekDayTableIndex = Calendar.current.component(.weekday, from: Date()) - 1
+
+                ScrollViewReader { proxy in
+                    List {
+                        ForEach(toDoListViewModel.toDoListCompletionList.indices, id: \.self) { index in
+                            
+                            
+                        }
+                    }
                 }
+                
                 
                 Spacer()
             }
@@ -51,6 +61,11 @@ struct ToDoDataResultListView: View {
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
+            .onAppear {
+                weekDayTableIndex = Calendar.current.component(.weekday, from: Date()) - 1
+                
+                toDoListViewModel.fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[weekDayTableIndex])
+            }
         }
     }
 }
