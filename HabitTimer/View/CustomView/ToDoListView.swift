@@ -28,7 +28,7 @@ struct ToDoListView: View {
                         if getShowDateState(index: index) == true {
                             HStack {
                                 Spacer()
-                                Text(toDoListViewModel.toDoList[index].date.yyyyMMddKR)
+                                Text(toDoListViewModel.toDoList[index].createDate.yyyyMMddKR)
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
                                     .frame(height: 20)
                                 Spacer()
@@ -130,7 +130,7 @@ struct ToDoListView: View {
             if index - 1 < toDoListViewModel.toDoList.count {
                 let preToDoListData = toDoListViewModel.toDoList[index - 1]
                 let currentToDoListData = toDoListViewModel.toDoList[index]
-                if preToDoListData.date.yyyyMMdd != currentToDoListData.date.yyyyMMdd {
+                if preToDoListData.createDate.yyyyMMdd != currentToDoListData.createDate.yyyyMMdd {
                     return true
                 }
             }

@@ -11,6 +11,7 @@ import Combine
 struct PomodoroView: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.scenePhase) var scenePhase
     
     private let secondTimer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     
@@ -28,14 +29,17 @@ struct PomodoroView: View {
     @State private var elapsedTime: Double = 0.0
     @State private var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
     @State private var minuteValue: Int = Config.POMODORO_WORK_TIME_MINUTE
-    @State private var minuteBreakValue: Int = Config.POMODORO_REST_TIME_MINUTE
+    @State private var minuteBreakValue: Int = Config.POMODORO_BREAK_TIME_MINUTE
     @State private var pomodoroState: PomodoroState = .초기화
     @State private var timerDisplay: String = "00:00"
     @State private var toast: Toast? = nil
     @State private var isDoneButtonShow: Bool = false
     @State private var isTimePickerShow: Bool = false
     @State private var isMenuShow: Bool = false
-    @State private var isAutoStart: Bool = false       // 자동으로 휴식 설정
+    @State private var isAlarmStatus: Bool = false       // 알림 모드 설정
+    @State private var isFullScreen: Bool = false
+    @State private var timeRemaining: Double = Double(Config.POMODORO_WORK_TIME_MINUTE) * Config.POMODORO_TIME_MINUTE
+    @State private var pomodoroScenePhase: ScenePhase? = nil
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -95,70 +99,58 @@ struct PomodoroView: View {
                 
                 GeometryReader { geometryProxy in
                     ZStack(alignment: .center) {
-                        Circle()
-                            .foregroundColor(self.color)
-                        
-                        Path { path in
-                            let size = geometryProxy.size
-                            let center = CGPoint(x: size.width / 2.0,
-                                                 y: size.height / 2.0)
-                            let radius = min(size.width, size.height) / 2.0
-                            path.move(to: center)
-                            path.addArc(center: center,
-                                        radius: radius,
-                                        startAngle: .init(degrees: Double(self.startPercent)),
-                                        endAngle: .init(degrees: Double(self.endPercent)),
-                                        clockwise: true)
-                            
-                        }
-                        .rotation(.init(degrees: 270))
-                        .foregroundColor(self.backgroundColor)
-                        .frame(width: geometryProxy.size.width,
-                               height: geometryProxy.size.height,
-                               alignment: .center)
-
-                        Circle()
-                            .strokeBorder(self.color, lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH / 2)
-                            .overlay {
-                                Circle()
-                                    .trim(from: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE > 0.016 ? (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) - 0.000008 : 0.0, to: (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) == 0 ? 0.0 : (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) + 0.008)
-                                    .stroke(themeColor, style: StrokeStyle(lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH, lineCap: .round, lineJoin: .round))
-                                    .rotationEffect(Angle(degrees: 270))
-                                    .animation(.smooth(duration: timerManager.timeRemaining == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
-                                    .padding(Config.TIME_CIRCLE_ROUND_WIDTH / 4)
-                                    
-                                
-                            }
-                        ZStack {
-                            Picker("", selection: $selectedMinute) {
-                                ForEach(1..<61) { minute in
-                                    Text(String(format: "%02d:00", minute))
-                                        .font(.system(size: 38, weight: .semibold))
-                                        .monospacedDigit()
-                                        .foregroundColor(Color("1F2020"))
-                                        .italic()
-                                        .tag(minute)
-                                }
-                            }
-                            .pickerStyle(.inline)
-                            .clipped()
-                            .onChange(of: selectedMinute) { oldValue, newValue in
-                                minuteValue = newValue
-                                
-                                if pomodoroState != .할일_완료 {
-                                    withAnimation(.easeOut(duration: 0.2)) {
-                                        self.isTimePickerShow.toggle()
-                                        self.setStartAction()
+                        if self.isFullScreen {
+                            ZStack {
+                                Picker("", selection: $selectedMinute) {
+                                    ForEach(1..<61) { minute in
+                                        Text(String(format: "%02d:00", minute))
+                                            .font(.system(size: 38, weight: .semibold))
+                                            .monospacedDigit()
+                                            .foregroundColor(Color("1F2020"))
+                                            .italic()
+                                            .tag(minute)
                                     }
                                 }
-                            }
-                            .opacity(self.isTimePickerShow ? 1: 0)
-                            
-                            Text(timerDisplay)
-                                .font(.system(size: 38, weight: .semibold))
-                                .monospacedDigit()
-                                .foregroundColor(Color("1F2020"))
-                                .italic()
+                                .pickerStyle(.inline)
+                                .clipped()
+                                .onChange(of: selectedMinute) { oldValue, newValue in
+                                    minuteValue = newValue
+                                    
+                                    if pomodoroState != .할일_완료 {
+                                        withAnimation(.easeOut(duration: 0.2)) {
+                                            self.isTimePickerShow.toggle()
+                                            self.setStartAction()
+                                        }
+                                    }
+                                }
+                                .opacity(self.isTimePickerShow ? 1: 0)
+
+                                VStack(alignment: .center, spacing: 10) {
+                                    Spacer()
+
+                                    Text(timerDisplay.divisionNewLineFirst)
+                                        .font(.system(size: 220, weight: .semibold))
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(1)
+                                        .monospacedDigit()
+                                        .background(.clear)
+                                        .foregroundColor(Color("1F2020"))
+                                        .italic()
+                                        .frame(maxWidth: .infinity, maxHeight: 170)
+                                    
+                                    Text(timerDisplay.divisionNewLineLast)
+                                        .font(.system(size: 220, weight: .semibold))
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(1)
+                                        .monospacedDigit()
+                                        .background(.clear)
+                                        .foregroundColor(Color("1F2020"))
+                                        .italic()
+                                        .frame(maxWidth: .infinity, maxHeight: 170)
+                                    
+                                    Spacer()
+                                }
+                                .opacity(self.isTimePickerShow ? 0 : 1)
                                 .onTapGesture {
                                     if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 || pomodoroState == .초기화 {
                                         self.isTimePickerShow.toggle()
@@ -166,19 +158,95 @@ struct PomodoroView: View {
                                         toast = Toast(type: .info, title: "", message: "현재 상태에서는 시간을 변경할 수 없습니다.", position: .top)
                                     }
                                 }
-                                .opacity(self.isTimePickerShow ? 0 : 1)
+                            }
+                        } else {
+                            Circle()
+                                .foregroundColor(self.color)
+                            
+                            Path { path in
+                                let size = geometryProxy.size
+                                let center = CGPoint(x: size.width / 2.0,
+                                                     y: size.height / 2.0)
+                                let radius = min(size.width, size.height) / 2.0
+                                path.move(to: center)
+                                path.addArc(center: center,
+                                            radius: radius,
+                                            startAngle: .init(degrees: Double(self.startPercent)),
+                                            endAngle: .init(degrees: Double(self.endPercent)),
+                                            clockwise: true)
+                                
+                            }
+                            .rotation(.init(degrees: 270))
+                            .foregroundColor(self.backgroundColor)
+                            .frame(width: geometryProxy.size.width,
+                                   height: geometryProxy.size.height,
+                                   alignment: .center)
+                            
+                            Circle()
+                                .strokeBorder(self.color, lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH / 2)
+                                .overlay {
+                                    Circle()
+                                        .trim(from: timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE > 0.016 ? (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) - 0.000008 : 0.0, to: (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) == 0 ? 0.0 : (timerManager.timeRemaining/Config.POMODORO_TIME_MINUTE) + 0.008)
+                                        .stroke(themeColor, style: StrokeStyle(lineWidth: Config.TIME_CIRCLE_ROUND_WIDTH, lineCap: .round, lineJoin: .round))
+                                        .rotationEffect(Angle(degrees: 270))
+                                        .animation(.smooth(duration: timerManager.timeRemaining == 0 ? 0.0 : 1.0), value: timerManager.timeRemaining)
+                                        .padding(Config.TIME_CIRCLE_ROUND_WIDTH / 4)
+                                    
+                                    
+                                }
+                            ZStack {
+                                Picker("", selection: $selectedMinute) {
+                                    ForEach(1..<61) { minute in
+                                        Text(String(format: "%02d:00", minute))
+                                            .font(.system(size: 38, weight: .semibold))
+                                            .monospacedDigit()
+                                            .foregroundColor(Color("1F2020"))
+                                            .italic()
+                                            .tag(minute)
+                                    }
+                                }
+                                .pickerStyle(.inline)
+                                .clipped()
+                                .onChange(of: selectedMinute) { oldValue, newValue in
+                                    minuteValue = newValue
+                                    
+                                    if pomodoroState != .할일_완료 {
+                                        withAnimation(.easeOut(duration: 0.2)) {
+                                            self.isTimePickerShow.toggle()
+                                            self.setStartAction()
+                                        }
+                                    }
+                                }
+                                .opacity(self.isTimePickerShow ? 1: 0)
+                                
+                                Text(timerDisplay)
+                                    .font(.system(size: 38, weight: .semibold))
+                                    .monospacedDigit()
+                                    .background(.clear)
+                                    .foregroundColor(Color("1F2020"))
+                                    .italic()
+                                    .onTapGesture {
+                                        if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 || pomodoroState == .초기화 {
+                                            self.isTimePickerShow.toggle()
+                                        } else {
+                                            toast = Toast(type: .info, title: "", message: "진행중에는 시간을 변경할 수 없습니다.", position: .top)
+                                        }
+                                    }
+                                    .opacity(self.isTimePickerShow ? 0 : 1)
+                            }
                         }
                     }
                 }
                 .padding(.horizontal, 20)
+ 
                 if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
                     HStack(spacing: 30) {
-                        RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
-                            setPomodoroStateChange()
-                        })
-                        
                         RoundedButton(leadingImage: Image(systemName: "stop.fill"), title: "정지", action: {
                             dismiss()
+                        })
+
+                        RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
+                            setPomodoroStateChange()
                         })
                     }
                     .padding(.bottom, 50)
@@ -208,8 +276,6 @@ struct PomodoroView: View {
             } else {
                 self.endPercent -= 0.1
             }
-            
-            print("self.endPercent = \(self.endPercent)")
 #else
             if value == 0 {
                 getTimerForAngle()
@@ -252,6 +318,8 @@ struct PomodoroView: View {
 #endif
         .onAppear {
             
+            bind()
+            
             setToDoPlayingForColor()
             
             withAnimation(.easeOut(duration: 0.2)) {
@@ -274,14 +342,85 @@ struct PomodoroView: View {
                     }
                 
                 if self.isMenuShow {
-                    BottomSheetView($isMenuShow, height: 350) {            /* 550  ---> 점수 모드 포함했을 경우에 height == 550 으로 한다. - Section 의 높이 */
+                    BottomSheetView($isMenuShow, height: 450) {
                         VStack {
-                            PomodoroSettingView(focusTime: $minuteValue, breakTime: $minuteBreakValue, isAutoStart: $isAutoStart)
+                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAlarmStatus: $isAlarmStatus, isFullScreen: $isFullScreen)
                         }
                     }
                 }
             }
         }
+        .onReceive(focusTimeSetting) { focusTimeIndex in
+            print("focusTimeIndex = \(focusTimeIndex)")
+        }
+        .onReceive(breakTimeSetting) { breakTimeIndex in
+            print("breakTimeIndex = \(breakTimeIndex)")
+        }
+        .onChange(of: isAlarmStatus) { oldValue, newValue in
+        }
+        .onChange(of: isFullScreen) { oldValue, newValue in
+            getSecondTimeToMinuteTime()
+        }
+        .onChange(of: scenePhase) { oldValue, newValue in
+            print("oldValue = \(oldValue), newValue = \(newValue)")
+
+            if oldValue == .inactive, newValue == .background {
+                if (pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중), self.timeRemaining >  2 {
+                    setFinishingTime()
+                }
+            } else if oldValue == .background, newValue == .inactive {
+                guard let savedDate = UserDefaults.standard.object(forKey: Config.TIMEREMAING_SAVE_ID) as? Date else {
+                    return
+                }
+                setDateComponents(savedDate)
+            }
+        }
+    }
+    
+    func setDateComponents(_ savedDate: Date) {
+        let currentDate = Date()
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.second], from: currentDate, to: savedDate)
+        
+        if let seconds = components.second {
+            if seconds > 0 {
+                let minute = seconds / Int(Config.POMODORO_TIME_MINUTE)
+                self.minuteValue = minute
+                
+                let newSecond = seconds.remainderReportingOverflow(dividingBy: Int(Config.POMODORO_TIME_MINUTE)).partialValue
+                timerManager.timeRemaining = TimeInterval(Int(Config.POMODORO_TIME_MINUTE) - newSecond)
+                
+                print("new timerManager.timeRemaining = \(timerManager.timeRemaining), minuteValue = \(self.minuteValue), timeRemaining = \(self.timeRemaining), newSecond = \(newSecond)")
+                
+            } else {
+                self.minuteValue = 0
+                timerManager.timeRemaining = 0
+                timerManager.resetTimer()
+            }
+            getSecondTimeToMinuteTime()
+        }
+    }
+    
+    func setFinishingTime() {
+        let currentDate = Date()
+        
+        var dateComponents = DateComponents()
+        dateComponents.second = Int(self.timeRemaining)
+        
+        let calendar = Calendar.current
+        
+        if let newDate = calendar.date(byAdding: dateComponents, to: currentDate) {
+            UserDefaults.standard.set(newDate, forKey: Config.TIMEREMAING_SAVE_ID)
+        }
+    }
+    
+    func bind(_ initState: Bool = true) {
+        self.selectedMinute = toDoListData.selectedMinute
+        self.minuteValue = self.selectedMinute
+        self.minuteBreakValue = toDoListData.breakMinute
+        
+        UserDefaults.standard.removeObject(forKey: Config.TIMEREMAING_SAVE_ID)
     }
     
     func setToDoPlayingForColor() {
@@ -302,22 +441,29 @@ struct PomodoroView: View {
     }
     
     func getTimerForAngle() {
+
+        if self.isFullScreen {
+            return
+        }
+
         var startAngle = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(minuteValue) * Config.POMODORO_TIME_MINUTE))
         
-        print("뽀모도로 시계 각도(startAngle) = \(startAngle), minuteValue = \(minuteValue)")
-        
         if self.minuteValue <= 0 {
+
+            if pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중 {
+                toDoListFinished()
+            }
+
             if pomodoroState == .할일_진행중 {
                 pomodoroState = .할일_완료
                 timerManager.pauseTimer()
-                
                 withAnimation(.easeInOut(duration: 0.2)) {
                     self.endPercent = 360
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self.selectedMinute = Config.POMODORO_REST_TIME_MINUTE
-                    self.minuteValue = Config.POMODORO_REST_TIME_MINUTE
+                    self.selectedMinute = self.minuteBreakValue
+                    self.minuteValue = self.minuteBreakValue
                     self.setStartAction()
                     DispatchQueue.main.async {
                         color = Color(hex: "0xE3EAA7")
@@ -342,6 +488,19 @@ struct PomodoroView: View {
         }
     }
 
+    func toDoListFinished() {
+        let toDoListCompletion: ToDoListCompletion = ToDoListCompletion()
+        toDoListCompletion.updateCompletionToDoData(
+            isDone: true,
+            pomodoroState: pomodoroState,
+            selectedMinute: self.selectedMinute,
+            remainingTime : 0,
+            breakMinute: pomodoroState == .할일_진행중 ? 0 : self.selectedMinute
+        )
+            
+        toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, toDoListCompletion: toDoListCompletion)
+    }
+    
     func getPomodoroStateImageDisplay() -> Image? {
         switch pomodoroState {
         case .초기화, .휴식_완료, .할일_완료:
@@ -394,10 +553,14 @@ struct PomodoroView: View {
             if isResume == false {
                 timerManager.startTimer()
             } else {
-                timerManager.resetTimer()
+                timerManager.resumeTimer()
             }
+            
+            NotificationManager.instance.scheduleNotification(title: pomodoroState == .할일_진행중 ? "집중 시간" : "휴식 시간", body: toDoListData.messageText, timeInterval: self.timeRemaining, triggerType: .time)
+            
         } else if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
             timerManager.pauseTimer()
+            NotificationManager.instance.cancelNotification()
         }
     }
     
@@ -414,8 +577,14 @@ struct PomodoroView: View {
             }
         }
         
+        self.timeRemaining = Double(minuteValue) * Config.POMODORO_TIME_MINUTE + Double(secondValue)
+        
         DispatchQueue.main.async {
-            timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
+            if self.isFullScreen {
+                timerDisplay = String(format: "%02d\n%02d", minuteValue, secondValue)
+            } else {
+                timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
+            }
         }
     }
 }

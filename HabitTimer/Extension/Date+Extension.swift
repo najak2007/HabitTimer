@@ -18,6 +18,7 @@ enum DateFormat: String {
     case yyyyMMdd = "yyyyMMdd"
     case yyyyMMddHyphen = "yyyy-MM-dd"
     case yyyyMMddDot = "yyyy.MM.dd"
+    case yyMMddDotE = "yy.MM.dd'('E')'"
     case MMdd = "MM/dd"
     case iso8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'"
     case iso86012 = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'"
@@ -85,6 +86,14 @@ extension Date {
         return newID
     }
         
+    var weekDay: String {
+        let weekDay = Calendar.current.component(.weekday, from: self)
+        if weekDay > 0 && weekDay < 7 {
+            return Config.WEEKDAY_TITLE[weekDay - 1]
+        }
+        return ""
+    }
+    
     var startOfToday: Date {
         let now = Date()
         let calendar = Calendar.current
@@ -113,6 +122,10 @@ extension Date {
     
     var yyMMddDot: String {
         return asString(format: .yyMMddDot)
+    }
+    
+    var yyMMddDotE: String {
+        return asString(format: .yyMMddDotE)
     }
     
     var EEEEMMMMddyyyy: String{

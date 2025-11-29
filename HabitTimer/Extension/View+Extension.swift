@@ -67,6 +67,31 @@ struct ClearButton: ViewModifier {
     }
 }
 
+struct NavigationTitleColorModifier: ViewModifier {
+    var color: Color
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(color)]
+                UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor(color)]
+            }
+    }
+}
+
+
+struct SegmentedControlStyleModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                UISegmentedControl.appearance().setTitleTextAttributes(
+                    [.font: UIFont(name: "GmarketSansTTFMedium", size: Config.SEGMENTED_CONTROL_STYLE_FONT_SIZE) ?? UIFont.systemFont(ofSize: Config.SEGMENTED_CONTROL_STYLE_FONT_SIZE)], for: .normal)
+                UISegmentedControl.appearance().setTitleTextAttributes(
+                    [.font: UIFont(name: "GmarketSansTTFMedium", size: Config.SEGMENTED_CONTROL_STYLE_FONT_SIZE) ?? UIFont.systemFont(ofSize: Config.SEGMENTED_CONTROL_STYLE_FONT_SIZE)], for: .selected)
+            }
+    }
+}
+
 extension View {
     func endTextEditing() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -82,5 +107,13 @@ extension View {
     
     func clearButton(text: Binding<String>) -> some View {
         modifier(ClearButton(text: text))
+    }
+    
+    func navigationTitleColor(_ color: Color) -> some View {
+        self.modifier(NavigationTitleColorModifier(color: color))
+    }
+    
+    func segmentedControlStyle() -> some View {
+        self.modifier(SegmentedControlStyleModifier())
     }
 }

@@ -7,11 +7,18 @@
 
 import SwiftUI
 import Foundation
+import Combine
 
 struct PomodoroSettingView: View {
-    @Binding var focusTime: Int
-    @Binding var breakTime: Int
-    @Binding var isAutoStart: Bool
+    var focusTime: Int
+    var breakTime: Int
+    @State private var focusTimeIndex: Int = 0
+    @State private var breakTimeIndex: Int = 0
+    
+    @Binding var isAlarmStatus: Bool
+    @Binding var isFullScreen: Bool
+    
+    @State private var toast: Toast? = nil
     
     var body: some View {
         List {
@@ -37,22 +44,28 @@ struct PomodoroSettingView: View {
                         
                         Spacer()
                         
-                        Picker("", selection: $focusTime) {
-                            ForEach(1..<61) { minute in
-                                Text(String(format: "%02d", minute))
+                        Picker("", selection: $focusTimeIndex) {
+                            ForEach(0..<60) { minute in
+                                Text(String(format: "%02d분", (minute + 1)))
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
                             }
                         }
                         .frame(width: 120)
                         .pickerStyle(.menu)
                         .tint(Color("1F2020"))
-                        .onChange(of: focusTime) { oldValue, newValue in
-                            if oldValue != newValue {
-                                
+                        .onChange(of: focusTimeIndex) { oldValue, newValue in
+                            if oldValue != 0, oldValue != newValue {
+                                focusTimeSetting.send(newValue + 1)
                             }
                         }
                     }
                 })
+                .onAppear {
+                    if focusTime > 0 {
+                        focusTimeIndex = focusTime - 1
+                    }
+                    self.isAlarmStatus = UserDefaults.standard.bool(forKey: Config.NOTIFICATION_SETTING_ID)
+                }
                 
                 Button(action: {
                     
@@ -75,30 +88,35 @@ struct PomodoroSettingView: View {
                         
                         Spacer()
                         
-                        Picker("", selection: $breakTime) {
-                            ForEach(1..<61) { minute in
-                                Text(String(format: "%02d", minute))
+                        Picker("", selection: $breakTimeIndex) {
+                            ForEach(0..<60) { minute in
+                                Text(String(format: "%02d분", (minute + 1)))
                                     .font(.custom("GmarketSansTTFMedium", size: 14))
                             }
                         }
                         .frame(width: 120)
                         .pickerStyle(.menu)
                         .tint(Color("1F2020"))
-                        .onChange(of: focusTime) { oldValue, newValue in
-                            if oldValue != newValue {
-                                
+                        .onChange(of: breakTimeIndex) { oldValue, newValue in
+                            if oldValue != 0, oldValue != newValue {
+                                breakTimeSetting.send(newValue + 1)
                             }
                         }
                     }
                 })
+                .onAppear {
+                    if breakTime > 0 {
+                        breakTimeIndex = breakTime - 1
+                    }
+                }
             }
             
-            Section(header: PomodoroListHeaderView(headerText: "시작 설정", showAlignments: .좌측정렬)) {
+            Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
                 Button(action: {
                     
                 }, label: {
                     HStack {
-                        Text("자동으로 휴식 시작")
+                        Text("알림 설정")
                             .font(.custom("GmarketSansTTFMedium", size: 20))
                             .foregroundColor(Color("1F2020"))
                             .multilineTextAlignment(.leading)
@@ -106,13 +124,46 @@ struct PomodoroSettingView: View {
                             
                         Spacer()
                         
-                        Toggle(isOn: $isAutoStart) {
+                        Toggle(isOn: $isAlarmStatus) {
                             Label("", systemImage: "flag.fill")
                         }
+                        .labelsHidden()
+                        .onChange(of: isAlarmStatus) { oldValue, newValue in
+                            if oldValue == false, newValue == true {
+                                NotificationManager.instance.getNotificationSettings { authStatus in
+                                    if authStatus.authorizationStatus != .authorized {
+                                        self.isAlarmStatus = false
+                                        DispatchQueue.main.async {
+                                            toast = Toast(type: .info, title: "", message: "알림 권한 허용 필요 (설정 > 알림 허용)", position: .center)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                
+                Button(action: {
+                    
+                }, label: {
+                    HStack {
+                        Text("전체 화면")
+                            .font(.custom("GmarketSansTTFMedium", size: 20))
+                            .foregroundColor(Color("1F2020"))
+                            .multilineTextAlignment(.leading)
+                            .padding(.leading, 0)
+                            
+                        Spacer()
+                        
+                        Toggle(isOn: $isFullScreen) {
+                            Label("", systemImage: "flag.fill")
+                        }
+                        .labelsHidden()
                     }
                 })
             }
         }
+        .toastView(toast: $toast)
         .environment(\.defaultMinListRowHeight, 80)
         .scrollDisabled(true)
     }

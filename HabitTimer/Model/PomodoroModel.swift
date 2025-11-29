@@ -13,7 +13,10 @@ var minutePassed = PassthroughSubject<Int, Never>()
 
 var pomodoroStartMode = PassthroughSubject<Bool, Never>()
 
-enum PomodoroState: Decodable, Encodable {
+var focusTimeSetting = PassthroughSubject<Int, Never>()
+var breakTimeSetting = PassthroughSubject<Int, Never>()
+
+enum PomodoroState: Int, Decodable, Encodable {
     case 초기화
     case 할일_진행중
     case 할일_일시정지
@@ -23,19 +26,47 @@ enum PomodoroState: Decodable, Encodable {
     case 휴식_완료
 }
 
+class ToDoListCompletion: Object, Comparable {
+    @objc dynamic var date: Date = Date()
+    @objc dynamic var dateForWeek: String = Date().weekDay
+    @objc dynamic var isDone: Bool = false
+    dynamic var pomodoroState: PomodoroState = .초기화
+    @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
+    @objc dynamic var remainingMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
+    @objc dynamic var breakMinute: Int = Config.POMODORO_BREAK_TIME_MINUTE
+    
+    static func < (lhs: ToDoListCompletion, rhs: ToDoListCompletion) -> Bool {
+        return lhs.date < rhs.date
+    }
+    
+    func updateCompletionToDoData(isDone: Bool, pomodoroState: PomodoroState, selectedMinute: Int, remainingTime: Int, breakMinute: Int) {
+        self.isDone = isDone
+        self.pomodoroState = pomodoroState
+        self.selectedMinute = selectedMinute
+        self.remainingMinute = remainingTime
+        self.breakMinute = breakMinute
+    }
+}
+
 final class ToDoListData: Object, Comparable {
     @objc dynamic var id: String = Date().toDoListID
     @objc dynamic var isFromYou: Bool = false
     @objc dynamic var messageText: String = ""
-    @objc dynamic var date: Date = Date()
+    @objc dynamic var createDate: Date = Date()
+    @objc dynamic var createDateForWeek: String =  Date().weekDay
+    
+#if __NOT_USE__
     @objc dynamic var isDone: Bool = false
     @objc dynamic var isRepeat: Bool = false
     @objc dynamic var placeName: String = ""
+    @objc dynamic var remainingTime: Int = 0
+#else
     @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
-    @objc dynamic var remainingTime: Double = 0
-    
+    @objc dynamic var breakMinute: Int = Config.POMODORO_BREAK_TIME_MINUTE
+    dynamic var toDoListItems: List<ToDoListCompletion> = List<ToDoListCompletion>()
+#endif
     static func < (lhs: ToDoListData, rhs: ToDoListData) -> Bool {
-        return lhs.date < rhs.date
+        return lhs.createDate < rhs.createDate
     }
     
     
