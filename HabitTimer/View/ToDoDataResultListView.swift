@@ -13,7 +13,8 @@ struct ToDoDataResultListView: View {
     @Environment(\.dismiss) var dismiss
     @State private var weekDayTableIndex: Int = 0
     
-    var toDoListViewModel: ToDoListViewModel
+    @StateObject private var toDoListViewModel = ToDoListViewModel()
+    @Binding var toDoListData: ToDoListData
     
     
     var body: some View {
@@ -30,8 +31,29 @@ struct ToDoDataResultListView: View {
                 ScrollViewReader { proxy in
                     List {
                         ForEach(toDoListViewModel.toDoListCompletionList.indices, id: \.self) { index in
-                            
-                            
+                            HStack {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text("시작 시간")
+                                        .font(.custom("GmarketSansTTFMedium", size: 16))
+                                        .foregroundColor(Color("1F2020")).opacity(0.6)
+                                              
+                                    Text(toDoListViewModel.toDoListCompletionList[index].date.yyyyMMddDot)
+                                        .font(.custom("GmarketSansTTFBold", size: 18))
+                                        .foregroundColor(Color("1F2020"))
+                                }
+                                .padding(.leading, 10)
+                                
+                                Spacer()
+                                
+                                Text("\(String(format: "%02d분", toDoListViewModel.toDoListCompletionList[index].selectedMinute))")
+                                    .font(.custom("GmarketSansTTFMedium", size: 18))
+                                    .monospacedDigit()
+                                    .background(.clear)
+                                    .foregroundColor(Color("1F2020"))
+                                    .italic()
+                                    .padding(.trailing, 10)
+                                
+                            }
                         }
                     }
                 }
@@ -64,7 +86,7 @@ struct ToDoDataResultListView: View {
             .onAppear {
                 weekDayTableIndex = Calendar.current.component(.weekday, from: Date()) - 1
                 
-                toDoListViewModel.fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[weekDayTableIndex])
+                toDoListViewModel.fetchToDoListForWeekDay(toDoListData, Config.WEEKDAY_TITLE[weekDayTableIndex])
             }
         }
     }

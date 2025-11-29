@@ -43,7 +43,6 @@ struct PomodoroView: View {
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
-    @Binding var isDetailShow: Bool
     @State private var messageText: String = ""
     var index: Int = 0
     
@@ -330,6 +329,7 @@ struct PomodoroView: View {
         .toastView(toast: $toast)
         .onDisappear {
             secondTimer.upstream.connect().cancel()
+            timerManager.resetTimer()
         }
         .onTapGesture {
             self.endTextEditing()
@@ -492,6 +492,7 @@ struct PomodoroView: View {
         let toDoListCompletion: ToDoListCompletion = ToDoListCompletion()
         toDoListCompletion.updateCompletionToDoData(
             isDone: true,
+            dateForWeek: Date().weekDay,
             pomodoroState: pomodoroState,
             selectedMinute: self.selectedMinute,
             remainingTime : 0,

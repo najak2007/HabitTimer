@@ -36,7 +36,17 @@ class ToDoListViewModel: ObservableObject {
         
     }
     
-    func fetchToDoListForWeekDay(_ weekString: String) {
+    func fetchToDoListForWeekDay(_ toDoListData: ToDoListData, _ weekString: String) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        
+        guard let toDoListItems = Array(results).filter({$0.id == toDoListData.id}).first?.toDoListItems else { return }
+        let toDoListCompletionList = Array(toDoListItems).filter({$0.dateForWeek == weekString && $0.isDone == true && $0.selectedMinute > 0})
+        
+        self.toDoListCompletionList = toDoListCompletionList
+    }
+    
+    func fetchAllToDoListForWeekDay(_ weekString: String) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
         let toDoListArray = Array(results)

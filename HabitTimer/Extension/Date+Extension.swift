@@ -88,7 +88,7 @@ extension Date {
         
     var weekDay: String {
         let weekDay = Calendar.current.component(.weekday, from: self)
-        if weekDay > 0 && weekDay < 7 {
+        if weekDay > 0 && weekDay < 8 {
             return Config.WEEKDAY_TITLE[weekDay - 1]
         }
         return ""
