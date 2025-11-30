@@ -27,38 +27,58 @@ struct ToDoDataResultListView: View {
                 }
                 .pickerStyle(.segmented)
                 .tint(Color("1F2020"))
+                .onChange(of: weekDayTableIndex) { oldValue, newValue in
+                    if oldValue != newValue {
+                        fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[newValue])
+                    }
+                }
 
                 ScrollViewReader { proxy in
                     List {
-                        ForEach(toDoListViewModel.toDoListCompletionList.indices, id: \.self) { index in
-                            HStack {
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text("시작 시간")
-                                        .font(.custom("GmarketSansTTFMedium", size: 16))
-                                        .foregroundColor(Color("1F2020")).opacity(0.6)
-                                              
-                                    Text(toDoListViewModel.toDoListCompletionList[index].date.yyyyMMddDot)
-                                        .font(.custom("GmarketSansTTFBold", size: 18))
-                                        .foregroundColor(Color("1F2020"))
+                        ForEach(toDoListViewModel.toDoListSectionCompletionList.indices, id: \.self) { sectionIndex in
+                            Section(header: PomodoroListHeaderView(headerText: self.getToDoListSectionTitle( toDoListViewModel.toDoListSectionCompletionList[sectionIndex].first), showAlignments: .좌측정렬)) {
+                                ForEach(toDoListViewModel.toDoListSectionCompletionList[sectionIndex].indices, id: \.self) { index in
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 5) {
+                                            Text("시작 시간")
+                                                .font(.custom("GmarketSansTTFMedium", size: 16))
+                                                .foregroundColor(Color("1F2020")).opacity(0.6)
+                                            
+                                            Text(toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].date.HHmm)
+                                                .font(.custom("GmarketSansTTFBold", size: 18))
+                                                .foregroundColor(Color("1F2020"))
+                                        }
+                                        .padding(.leading, 10)
+                                        
+                                        Spacer()
+                                        
+                                        Text("\(String(format: "%02d분", toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].selectedMinute))")
+                                            .font(.custom("GmarketSansTTFMedium", size: 18))
+                                            .monospacedDigit()
+                                            .background(.clear)
+                                            .foregroundColor(Color("1F2020"))
+                                            .italic()
+                                            .padding(.trailing, 10)
+                                        
+                                    }
                                 }
-                                .padding(.leading, 10)
-                                
-                                Spacer()
-                                
-                                Text("\(String(format: "%02d분", toDoListViewModel.toDoListCompletionList[index].selectedMinute))")
-                                    .font(.custom("GmarketSansTTFMedium", size: 18))
-                                    .monospacedDigit()
-                                    .background(.clear)
-                                    .foregroundColor(Color("1F2020"))
-                                    .italic()
-                                    .padding(.trailing, 10)
-                                
                             }
                         }
                     }
+                    .padding(.top, -34)
+                    .overlay {
+                        VStack(alignment: .center) {
+                            Spacer()
+                        
+                            Image("icon_list_empty")
+                                .resizable()
+                                .frame(width: 280, height: 187)
+                        
+                            Spacer()
+                        }
+                        .opacity(self.toDoListViewModel.toDoListSectionCompletionList.isEmpty ? 1 : 0)
+                    }
                 }
-                
-                
                 Spacer()
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -85,9 +105,17 @@ struct ToDoDataResultListView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 weekDayTableIndex = Calendar.current.component(.weekday, from: Date()) - 1
-                
-                toDoListViewModel.fetchToDoListForWeekDay(toDoListData, Config.WEEKDAY_TITLE[weekDayTableIndex])
+                fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[weekDayTableIndex])
             }
         }
+    }
+    
+    func fetchToDoListForWeekDay(_ weekDayString: String) {
+        toDoListViewModel.fetchToDoListForWeekDay(toDoListData, weekDayString)
+    }
+    
+    func getToDoListSectionTitle(_ toDoListCompletion: ToDoListCompletion?) -> String {
+        guard let toDoListCompletion else { return "" }
+        return toDoListCompletion.date.yyyyMMddDot
     }
 }

@@ -316,9 +316,7 @@ struct PomodoroView: View {
         .animation(.smooth, value: showing)
 #endif
         .onAppear {
-            
             bind()
-            
             setToDoPlayingForColor()
             
             withAnimation(.easeOut(duration: 0.2)) {
@@ -494,7 +492,7 @@ struct PomodoroView: View {
             isDone: true,
             dateForWeek: Date().weekDay,
             pomodoroState: pomodoroState,
-            selectedMinute: self.selectedMinute,
+            selectedMinute: pomodoroState == .할일_진행중 ? self.selectedMinute : 0,
             remainingTime : 0,
             breakMinute: pomodoroState == .할일_진행중 ? 0 : self.selectedMinute
         )

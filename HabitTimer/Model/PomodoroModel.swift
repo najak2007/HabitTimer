@@ -30,7 +30,7 @@ class ToDoListCompletion: Object, Comparable {
     @objc dynamic var date: Date = Date()
     @objc dynamic var dateForWeek: String = Date().weekDay
     @objc dynamic var isDone: Bool = false
-    dynamic var pomodoroState: PomodoroState = .초기화
+    dynamic var pomodoroState: Int = PomodoroState.초기화.rawValue
     @objc dynamic var selectedMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
     @objc dynamic var remainingMinute: Int = Config.POMODORO_WORK_TIME_MINUTE
     @objc dynamic var breakMinute: Int = Config.POMODORO_BREAK_TIME_MINUTE
@@ -42,7 +42,7 @@ class ToDoListCompletion: Object, Comparable {
     func updateCompletionToDoData(isDone: Bool, dateForWeek: String, pomodoroState: PomodoroState, selectedMinute: Int, remainingTime: Int, breakMinute: Int) {
         self.isDone = isDone
         self.dateForWeek = dateForWeek
-        self.pomodoroState = pomodoroState
+        self.pomodoroState = pomodoroState == .할일_진행중 ? PomodoroState.할일_완료.rawValue : PomodoroState.휴식_완료.rawValue
         self.selectedMinute = selectedMinute
         self.remainingMinute = remainingTime
         self.breakMinute = breakMinute
