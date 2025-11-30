@@ -25,7 +25,7 @@ struct PostitListView: View {
     @State private var isEditing: Bool = false
     @State private var isAddToDoListShow: Bool = false
     @State private var isDeleteAction: Bool = false
-    @State private var isDetailShow: Bool = false
+    @State private var isPomodoroShow: Bool = false
     @State private var isToDoListHistoryView: Bool = false
     @State private var isSiriRegister: Bool = false
     @State private var size: CGSize = .zero
@@ -109,7 +109,7 @@ struct PostitListView: View {
                         .onTapGesture {
                             self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
                             self.toDoListViewModel.selectedIndex = index
-                            self.isDetailShow.toggle()
+                            self.isPomodoroShow.toggle()
                         }
                         .id(toDoListViewModel.toDoList[index].id)
                     }
@@ -257,17 +257,15 @@ struct PostitListView: View {
                 UIApplication.shared.endEditing()
             }
         }
-        .fullScreenCover(isPresented: $isDetailShow, content: {
-            PomodoroView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
+        .fullScreenCover(isPresented: $isPomodoroShow, content: {
+            PomodoroView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData, index: toDoListViewModel.selectedIndex)
         })
         .transaction { transaction in
             transaction.disablesAnimations = true
             
         }
         .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
-//            PomodoroHistoryView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData , isDetailShow: $isDetailShow, index: toDoListViewModel.selectedIndex)
-            
-            ToDoDataResultListView()
+            ToDoDataResultListView(toDoListData: $toDoListViewModel.selectedToDoListData)
         })
         .toastView(toast: $toast)
 

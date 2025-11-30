@@ -13,6 +13,8 @@ class ToDoListViewModel: ObservableObject {
     private var realm: Realm?
     
     @Published var toDoList: [ToDoListData] = []
+    @Published var toDoListCompletionList: [ToDoListCompletion] = []
+    @Published var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[]]
     
     @Published var selectedIndex: Int = 0
     @Published var selectedToDoListData: ToDoListData = ToDoListData()
@@ -33,6 +35,54 @@ class ToDoListViewModel: ObservableObject {
         
         toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
         
+    }
+    
+    func fetchToDoListForWeekDay(_ toDoListData: ToDoListData, _ weekString: String) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        
+        guard let toDoListItems = Array(results).filter({$0.id == toDoListData.id}).first?.toDoListItems else { return }
+        let toDoListCompletionList = Array(toDoListItems).filter({$0.dateForWeek == weekString && $0.isDone == true && $0.selectedMinute > 0})
+        var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[]]
+        
+        var sectionIndex: Int = 0
+        var sectionDate: String = ""
+        
+        for toDoListCompletion in toDoListCompletionList {
+            let dateString = toDoListCompletion.date.yyyyMMdd
+            
+            if sectionDate.isEmpty || sectionDate == dateString {
+                toDoListSectionCompletionList[sectionIndex].append(toDoListCompletion)
+            } else {
+                sectionIndex += 1
+                toDoListSectionCompletionList[sectionIndex].append(toDoListCompletion)
+            }
+            sectionDate = dateString
+        }
+        
+        self.toDoListSectionCompletionList = toDoListSectionCompletionList
+    }
+    
+    func fetchAllToDoListForWeekDay(_ weekString: String) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        let toDoListArray = Array(results)
+        var toDoListFinishDoneItemArr: [ToDoListCompletion] = []
+        
+        
+        if toDoListArray.isEmpty == false {
+            for toDoListItem in toDoListArray {
+                let toDoListArr = toDoListItem.toDoListItems.filter { $0.dateForWeek == weekString && $0.isDone == true && $0.selectedMinute > 0}
+                
+                if toDoListArr.isEmpty == false {
+                    toDoListFinishDoneItemArr.append(contentsOf: toDoListArr)
+                }
+            }
+            
+            if toDoListArray.isEmpty == false {
+                toDoListCompletionList = toDoListFinishDoneItemArr
+            }
+        }
     }
     
     func addToDoList(_ toDoListData: ToDoListData) {
