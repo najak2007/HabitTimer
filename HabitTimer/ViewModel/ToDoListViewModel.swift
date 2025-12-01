@@ -14,7 +14,7 @@ class ToDoListViewModel: ObservableObject {
     
     @Published var toDoList: [ToDoListData] = []
     @Published var toDoListCompletionList: [ToDoListCompletion] = []
-    @Published var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[]]
+    @Published var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[ToDoListCompletion]]()
     
     @Published var selectedIndex: Int = 0
     @Published var selectedToDoListData: ToDoListData = ToDoListData()
@@ -43,24 +43,23 @@ class ToDoListViewModel: ObservableObject {
         
         guard let toDoListItems = Array(results).filter({$0.id == toDoListData.id}).first?.toDoListItems else { return }
         let toDoListCompletionList = Array(toDoListItems).filter({$0.dateForWeek == weekString && $0.isDone == true && $0.selectedMinute > 0})
-        var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[]]
+        var toDoListDateArr: [[ToDoListCompletion]] = [[ToDoListCompletion]]()
         
-        var sectionIndex: Int = 0
         var sectionDate: String = ""
-        
         for toDoListCompletion in toDoListCompletionList {
             let dateString = toDoListCompletion.date.yyyyMMdd
             
-            if sectionDate.isEmpty || sectionDate == dateString {
-                toDoListSectionCompletionList[sectionIndex].append(toDoListCompletion)
-            } else {
-                sectionIndex += 1
-                toDoListSectionCompletionList[sectionIndex].append(toDoListCompletion)
+            if sectionDate.isEmpty || sectionDate != dateString {
+                let sectionToDoCompletionArr = toDoListCompletionList.filter({$0.date.yyyyMMdd == dateString})
+
+                if sectionToDoCompletionArr.isEmpty == false {
+                    toDoListDateArr.append(sectionToDoCompletionArr)
+                }
             }
             sectionDate = dateString
         }
         
-        self.toDoListSectionCompletionList = toDoListSectionCompletionList
+        self.toDoListSectionCompletionList = toDoListDateArr
     }
     
     func fetchAllToDoListForWeekDay(_ weekString: String) {

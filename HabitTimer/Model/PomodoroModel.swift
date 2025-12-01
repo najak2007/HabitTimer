@@ -39,8 +39,9 @@ class ToDoListCompletion: Object, Comparable {
         return lhs.date < rhs.date
     }
     
-    func updateCompletionToDoData(isDone: Bool, dateForWeek: String, pomodoroState: PomodoroState, selectedMinute: Int, remainingTime: Int, breakMinute: Int) {
+    func updateCompletionToDoData(isDone: Bool, date: Date = Date(), dateForWeek: String, pomodoroState: PomodoroState, selectedMinute: Int, remainingTime: Int, breakMinute: Int) {
         self.isDone = isDone
+        self.date = date
         self.dateForWeek = dateForWeek
         self.pomodoroState = pomodoroState == .할일_진행중 ? PomodoroState.할일_완료.rawValue : PomodoroState.휴식_완료.rawValue
         self.selectedMinute = selectedMinute

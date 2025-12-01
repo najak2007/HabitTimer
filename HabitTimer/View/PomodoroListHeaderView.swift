@@ -25,7 +25,7 @@ struct PomodoroListHeaderView: View {
             }
             
             Text(headerText)
-                .font(.custom("GmarketSansTTFLight", size: fontSize))
+                .font(.custom("GmarketSansTTFMedium", size: fontSize))
                 .foregroundColor(Color("1F2020"))
             
             if showAlignments == .좌측정렬 || showAlignments == .가운데정렬 {

@@ -63,6 +63,16 @@ extension Date {
         return ""
     }
     
+    func getAllDates() -> [Date] {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: Calendar.current.dateComponents([.year, .month], from: self))!
+        let range = calendar.range(of: .day, in: .month, for: startDate)!
+        
+        return range.compactMap { day -> Date in
+            calendar.date(byAdding: .day, value: day - 1, to: startDate) ?? Date()
+        }
+    }
+    
     func asString(format: DateFormat, timeZone: TimeZone? = TimeZone(abbreviation: "KST")) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = timeZone
