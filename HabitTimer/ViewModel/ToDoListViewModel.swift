@@ -14,6 +14,7 @@ class ToDoListViewModel: ObservableObject {
     
     @Published var toDoList: [ToDoListData] = []
     @Published var toDoListCompletionList: [ToDoListCompletion] = []
+    @Published var toDoListSectionCompletionList: [[ToDoListCompletion]] = [[ToDoListCompletion]]()
     
     @Published var selectedIndex: Int = 0
     @Published var selectedToDoListData: ToDoListData = ToDoListData()
@@ -36,7 +37,32 @@ class ToDoListViewModel: ObservableObject {
         
     }
     
-    func fetchToDoListForWeekDay(_ weekString: String) {
+    func fetchToDoListForWeekDay(_ toDoListData: ToDoListData, _ weekString: String) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        
+        guard let toDoListItems = Array(results).filter({$0.id == toDoListData.id}).first?.toDoListItems else { return }
+        let toDoListCompletionList = Array(toDoListItems).filter({$0.dateForWeek == weekString && $0.isDone == true && $0.selectedMinute > 0})
+        var toDoListDateArr: [[ToDoListCompletion]] = [[ToDoListCompletion]]()
+        
+        var sectionDate: String = ""
+        for toDoListCompletion in toDoListCompletionList {
+            let dateString = toDoListCompletion.date.yyyyMMdd
+            
+            if sectionDate.isEmpty || sectionDate != dateString {
+                let sectionToDoCompletionArr = toDoListCompletionList.filter({$0.date.yyyyMMdd == dateString})
+
+                if sectionToDoCompletionArr.isEmpty == false {
+                    toDoListDateArr.append(sectionToDoCompletionArr)
+                }
+            }
+            sectionDate = dateString
+        }
+        
+        self.toDoListSectionCompletionList = toDoListDateArr
+    }
+    
+    func fetchAllToDoListForWeekDay(_ weekString: String) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
         let toDoListArray = Array(results)

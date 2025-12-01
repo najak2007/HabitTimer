@@ -43,7 +43,6 @@ struct PomodoroView: View {
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
-    @Binding var isDetailShow: Bool
     @State private var messageText: String = ""
     var index: Int = 0
     
@@ -317,9 +316,7 @@ struct PomodoroView: View {
         .animation(.smooth, value: showing)
 #endif
         .onAppear {
-            
             bind()
-            
             setToDoPlayingForColor()
             
             withAnimation(.easeOut(duration: 0.2)) {
@@ -330,6 +327,7 @@ struct PomodoroView: View {
         .toastView(toast: $toast)
         .onDisappear {
             secondTimer.upstream.connect().cancel()
+            timerManager.resetTimer()
         }
         .onTapGesture {
             self.endTextEditing()
@@ -492,13 +490,21 @@ struct PomodoroView: View {
         let toDoListCompletion: ToDoListCompletion = ToDoListCompletion()
         toDoListCompletion.updateCompletionToDoData(
             isDone: true,
+            date: Date(),
+            dateForWeek: Date().weekDay,
             pomodoroState: pomodoroState,
-            selectedMinute: self.selectedMinute,
+            selectedMinute: pomodoroState == .할일_진행중 ? self.selectedMinute : 0,
             remainingTime : 0,
             breakMinute: pomodoroState == .할일_진행중 ? 0 : self.selectedMinute
         )
             
         toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, toDoListCompletion: toDoListCompletion)
+    }
+    
+    func subtractDaysFromDate(days: Int, from date: Date) -> Date {
+        guard let changeDate = Calendar.current.date(byAdding: .day, value: -days, to: date) else { return Date() }
+        
+        return changeDate
     }
     
     func getPomodoroStateImageDisplay() -> Image? {

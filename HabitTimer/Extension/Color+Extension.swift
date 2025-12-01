@@ -8,6 +8,34 @@
 import SwiftUI
 
 extension Color {
+    static let errorRed = Color.init(hex: "FF5959")
+    static let errorGreen = Color.init(hex: "4CD964")
+    /// 말풍선 색상
+    static let bubble = Color.init(hex: "D8EBFC")
+    
+    static let main = Color.init(hex: "FF7E7E")
+    /// Sub / main
+    static let sub = Color.init(hex: "FF9A9A")
+    /// Medium
+    static let medium = Color.init(hex: "FFF0F0")
+    /// Bright
+    static let bright = Color.init(hex: "FFF3F3")
+    
+    /// Black
+    static let symBlack = Color.init(hex: "313439")
+    /// Gray6
+    static let symGray6 = Color.init(hex: "42454A")
+    /// Gray5
+    static let symGray5 = Color.init(hex: "69707B")
+    /// Gray4
+    static let symGray4 = Color.init(hex: "9BA3AE")
+    /// Gray3
+    static let symGray3 = Color.init(hex: "CCD2DA")
+    /// Gray2
+    static let symGray2 = Color.init(hex: "E8EAED")
+    /// Gray1
+    static let symGray1 = Color.init(hex: "F3F5F8")
+    
     static var random: Color {
         return Color(
             red: .random(in: 0...1),
