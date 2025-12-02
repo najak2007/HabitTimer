@@ -9,7 +9,8 @@ import SwiftUI
 
 struct DateButton: View {
     var value: DateValue
-    @ObservedObject var calendarViewModel: CalendarViewModel
+    var calendarViewModel: CalendarViewModel
+    var toDoListData: ToDoListData
     @Binding var selectDate: Date
     
     private var isToday: Bool {
@@ -29,7 +30,7 @@ struct DateButton: View {
             Button {
                 selectDate = value.date
             } label: {
-                VStack(spacing: 3) {
+                VStack(spacing: 6) {
                     Text(isToday ? "오늘" : "")
                         .font(.custom("GmarketSansTTFMedium", size: 12))
                         .foregroundStyle(Color.errorRed)
@@ -38,10 +39,10 @@ struct DateButton: View {
                     Text("\(value.day)")
                         .font(.custom("GmarketSansTTFBold", size: 18))
                         .fontWeight(.bold)
-                        .foregroundColor(calendarViewModel.toDoListExists(on: value.date.yyyyMMddDot) ? (dayOfWeek == 1 ? Color.errorRed : Color.symGray5) : (dayOfWeek == 1 ? Color.sub : Color.symGray4))
+                        .foregroundColor(calendarViewModel.toDoListExists(toDoListData, on: value.date.yyyyMMddDot) ? (dayOfWeek == 1 ? Color.errorRed : Color.symGray5) : (dayOfWeek == 1 ? Color.sub : Color.symGray4))
                     
                     Circle()
-                        .fill(calendarViewModel.toDoListExists(on: value.date.yyyyMMddDot) ?
+                        .fill(calendarViewModel.toDoListExists(toDoListData, on: value.date.yyyyMMddDot) ?
                               Color.main : Color.white)
                         .frame(width: 6, height: 6)
                 }

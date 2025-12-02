@@ -83,7 +83,11 @@ struct ToDoDataResultListView: View {
                     }
                     Spacer()
                 } else {
-                    WeekdayHeaderView()
+                    VStack {
+                        CalendarView(toDoListData: toDoListData)
+                        
+                        Spacer()
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)

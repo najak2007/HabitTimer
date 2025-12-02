@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct DatesGridView: View {
+//    @StateObject private var calendarViewModel: CalendarViewModel = CalendarViewModel()
     @ObservedObject var calendarViewModel: CalendarViewModel
+    var toDoListData: ToDoListData
     
     private let columns = Array(repeating: GridItem(.flexible()), count: Config.WEEKDAY_TITLE.count)
+    
     
     var body: some View {
         // 달력 그리드
@@ -19,6 +22,7 @@ struct DatesGridView: View {
                 if value.day != -1 {
                     DateButton(value: value,
                                calendarViewModel: calendarViewModel,
+                               toDoListData: toDoListData,
                                selectDate: $calendarViewModel.selectDate)
                         .onTapGesture {
                             calendarViewModel.checkingDate = value.date
@@ -30,6 +34,9 @@ struct DatesGridView: View {
                     Text("\(value.day)").hidden()
                 }
             }
+        }
+        .onAppear {
+            
         }
     }
 }
