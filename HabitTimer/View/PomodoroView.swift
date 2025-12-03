@@ -340,7 +340,7 @@ struct PomodoroView: View {
                     }
                 
                 if self.isMenuShow {
-                    BottomSheetView($isMenuShow, height: 450) {
+                    BottomSheetView($isMenuShow, height: 510) {
                         VStack {
                             PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAlarmStatus: $isAlarmStatus, isFullScreen: $isFullScreen)
                         }

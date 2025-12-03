@@ -161,9 +161,12 @@ struct ToDoDataResultListView: View {
             )
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    HStack {
+                    VStack(spacing: 5) {
                         Text("완료한 일")
                             .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
+                            .foregroundColor(Color("1F2020"))
+                        Text(toDoListData.messageText)
+                            .font(.custom("GmarketSansTTFRegular", size: Config.SUB_HEADER_TITLE_FONT_SIZE))
                             .foregroundColor(Color("1F2020"))
                         
                     }
