@@ -43,7 +43,7 @@ struct DateButton: View {
                     
                     Circle()
                         .fill(calendarViewModel.toDoListExists(toDoListData, on: value.date.yyyyMMddDot) ?
-                              Color.main : Color.white)
+                              Color.main : .clear)
                         .frame(width: 6, height: 6)
                 }
                 .background(

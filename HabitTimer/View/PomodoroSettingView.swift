@@ -112,6 +112,22 @@ struct PomodoroSettingView: View {
             }
             
             Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 3) {
+                        ForEach(Config.WEEKDAY_TITLE, id: \.self) { item in
+                            Text(item)
+                                .font(.custom("GmarketSansTTFMedium", size: 16))
+                                .foregroundStyle(Color("1F2020"))
+                                .padding()
+                                .background(Color.blue)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .padding(.horizontal, 5)
+                }
+                .scrollDisabled(true)
+                
+                
                 Button(action: {
                     
                 }, label: {

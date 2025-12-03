@@ -16,7 +16,8 @@ enum InputTypeError {
 
 class Config {
     static let NAVIGATION_HEIGHT: CGFloat = 80
-    static let MAIN_HEADER_TITLE_FONT_SIZE: CGFloat = 20
+    static let MAIN_HEADER_TITLE_FONT_SIZE: CGFloat = 18
+    static let SUB_HEADER_TITLE_FONT_SIZE: CGFloat = 14
     
     static let INPUT_VIEW_HEADER_FONT_SIZE: CGFloat = 14
     

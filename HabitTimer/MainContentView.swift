@@ -152,7 +152,7 @@ struct PostitListView: View {
                         HStack(spacing: 4) {
                             Text(date.yyMMddDotE)
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
-                                .foregroundColor(Color("1F2020"))
+                                .foregroundColor(.black)
                                 .onChange(of: date) { oldValue, newValue in
                                     bind(oldValue != newValue)
                                 }
@@ -160,7 +160,7 @@ struct PostitListView: View {
                             Image(systemName: "arrowtriangle.down.circle")
                                 .resizable()
                                 .frame(width: 20, height: 20)
-                                .foregroundColor(Color("1F2020"))
+                                .foregroundColor(.black)
                         }
                         .overlay {
                             DatePicker(selection: $date, displayedComponents: [.date]) {
