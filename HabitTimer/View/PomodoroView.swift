@@ -501,12 +501,6 @@ struct PomodoroView: View {
         toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, toDoListCompletion: toDoListCompletion)
     }
     
-    func subtractDaysFromDate(days: Int, from date: Date) -> Date {
-        guard let changeDate = Calendar.current.date(byAdding: .day, value: -days, to: date) else { return Date() }
-        
-        return changeDate
-    }
-    
     func getPomodoroStateImageDisplay() -> Image? {
         switch pomodoroState {
         case .초기화, .휴식_완료, .할일_완료:

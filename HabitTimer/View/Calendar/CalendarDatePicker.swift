@@ -25,6 +25,7 @@ struct CalendarDatePicker: View {
                 isShowingDateChangeSheet.toggle()
             } label: {
                 Text("완료")
+                    .font(.custom("GmarketSansTTFMedium", size: 18))
             }
             .buttonStyle(MainButtonStyle(isButtonEnabled: true))
             .padding(20)
@@ -53,7 +54,7 @@ struct CustomDatePicker: UIViewRepresentable { // UIKit의 UIView를 SwiftUI에�
         picker.dataSource = context.coordinator
         picker.delegate = context.coordinator
         
-        picker.selectRow(selectedYear - 1, inComponent: 0, animated: false)
+        picker.selectRow(selectedYear - Config.CALENDAR_START_YEAR, inComponent: 0, animated: false)
         picker.selectRow(selectedMonth - 1, inComponent: 1, animated: false)
         return picker
     }
@@ -71,7 +72,7 @@ struct CustomDatePicker: UIViewRepresentable { // UIKit의 UIView를 SwiftUI에�
         var availableYear: [Int] {
             get {
                 var years: [Int] = []
-                for i in 2024...Int(todayYear)! {
+                for i in Config.CALENDAR_START_YEAR...Int(todayYear)! {
                     years.append(i)
                 }
                 return years

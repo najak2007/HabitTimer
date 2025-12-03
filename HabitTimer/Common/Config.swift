@@ -47,5 +47,6 @@ class Config {
     static let TIMEREMAING_SAVE_ID: String = "habitTimer.timerRemaining.save"
     
     static let WEEKDAY_TITLE: [String] = ["일", "월", "화", "수", "목", "금", "토"]
+    static let CALENDAR_START_YEAR: Int = 2025
     static let SEGMENTED_CONTROL_STYLE_FONT_SIZE: CGFloat = 18
 }

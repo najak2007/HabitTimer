@@ -10,7 +10,7 @@ import SwiftUI
 
 struct CalendarView: View {
     @State private var offset: CGSize = CGSize()
-    @StateObject private var calendarViewModel: CalendarViewModel = CalendarViewModel()
+    @ObservedObject var calendarViewModel: CalendarViewModel
     @State private var isShowingDateChangeSheet: Bool = false
     var toDoListData: ToDoListData
     
@@ -45,7 +45,7 @@ struct CalendarView: View {
                             calendarViewModel.selectedMonth += 1
                         }
                     } else if gesture.translation.width > 20 {
-                        if selectyear == 2026 && selectMonth == 1 {
+                        if selectyear == Config.CALENDAR_START_YEAR && selectMonth == 1 {
                             
                         } else {
                             calendarViewModel.currentMonth -= 1

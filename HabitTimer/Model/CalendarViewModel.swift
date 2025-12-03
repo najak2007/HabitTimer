@@ -9,10 +9,15 @@ import SwiftUI
 import Combine
 import RealmSwift
 
+var futureDaySelected = PassthroughSubject<Void, Never>()
+var expandDaySelected = PassthroughSubject<Bool, Never>()
+
 struct DateValue: Identifiable {
     var id: String = UUID().uuidString
     var day: Int
     var date: Date
+    var expandDay: Int = -1
+    var isPreviousDay: Bool = true
 }
 
 final class CalendarViewModel: ObservableObject {
@@ -49,7 +54,7 @@ final class CalendarViewModel: ObservableObject {
     
     func checkingDateFuture() {
         if popupDate {
-            // 미래 날짜는 아직 기록할 수 없어요
+            futureDaySelected.send()
         } else {
             
         }
@@ -58,7 +63,10 @@ final class CalendarViewModel: ObservableObject {
     func extractDate(currentMonth: Int) -> [DateValue] {
         let calendar = Calendar.current
         
+        let previousMonth = getCurrentMonth(addingMonth: currentMonth - 1)
+        let nextMonth = getCurrentMonth(addingMonth: currentMonth + 1)
         let currentMonth = getCurrentMonth(addingMonth: currentMonth)
+
         
         var days = currentMonth.getAllDates().compactMap { date -> DateValue in
             let day = calendar.component(.day, from: date)
@@ -66,12 +74,44 @@ final class CalendarViewModel: ObservableObject {
         }
         
         let firstWeekday = calendar.component(.weekday, from: days.first?.date ?? Date())
+        let lastWeekday = calendar.component(.weekday, from: days.last?.date ?? Date())
         
-        for _ in 0 ..< firstWeekday - 1 {
-            days.insert(DateValue(day: -1, date: Date()), at: 0)
+        if firstWeekday != 0 {
+            let previousDays = expandExtractDate(currentMonth: previousMonth, currentWeekday: firstWeekday)
+            
+            for index in 0 ..< previousDays.count {
+                days.insert(DateValue(day: -1, date: previousDays[index].date, expandDay: previousDays[index].day), at: 0)
+            }
+        }
+        
+        if lastWeekday != 7 {
+            let nextDays = expandExtractDate(currentMonth: nextMonth, currentWeekday: lastWeekday, isPreviousDay: false)
+            
+            for value in nextDays {
+                days.append(DateValue(day: -1, date: value.date, expandDay: value.day, isPreviousDay: false))
+            }
         }
         
         return days
+    }
+    
+    func subtractDaysFromDate(days: Int, from date: Date) -> Date {
+        guard let changeDate = Calendar.current.date(byAdding: .day, value: -days, to: date) else { return Date() }
+        
+        return changeDate
+    }
+    
+    func expandExtractDate(currentMonth: Date, currentWeekday: Int, isPreviousDay: Bool = true) -> [DateValue] {
+        let calendar = Calendar.current
+        let days: [DateValue] = currentMonth.getAllDates().compactMap { date -> DateValue in
+            let day = calendar.component(.day, from: date)
+            return DateValue(day: day, date: date)
+        }
+        if isPreviousDay {
+            return days.suffix(currentWeekday - 1).reversed()
+        }
+        
+        return Array(days.prefix(7 - currentWeekday))
     }
     
     func isSameDay(date1: Date, date2: Date) -> Bool {
