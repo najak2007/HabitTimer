@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Combine
 
 struct DatesGridView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
+    var toDoListData: ToDoListData
     
     private let columns = Array(repeating: GridItem(.flexible()), count: Config.WEEKDAY_TITLE.count)
     
@@ -19,17 +21,30 @@ struct DatesGridView: View {
                 if value.day != -1 {
                     DateButton(value: value,
                                calendarViewModel: calendarViewModel,
+                               toDoListData: toDoListData,
                                selectDate: $calendarViewModel.selectDate)
                         .onTapGesture {
                             calendarViewModel.checkingDate = value.date
                             calendarViewModel.popupDate = true
                             calendarViewModel.checkingDateFuture()
                         }
-                } else {
+                } else if value.day == -1 {
+#if __NOT_USE__
                     // 날짜 공백때문에 -1이 있을경우 숨긴다
                     Text("\(value.day)").hidden()
+#endif
+                    Text("\(value.expandDay)")
+                        .foregroundColor(Color.symGray4).opacity(0.6)
+                        .font(.custom("GmarketSansTTFLight", size: 18))
+                        .onTapGesture {
+                            calendarViewModel.selectDate = value.date
+                            expandDaySelected.send(value.isPreviousDay)
+                        }
                 }
             }
+        }
+        .onAppear {
+            
         }
     }
 }

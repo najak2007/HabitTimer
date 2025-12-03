@@ -13,8 +13,11 @@ struct ToDoDataResultListView: View {
     @Environment(\.dismiss) var dismiss
     @State private var weekDayTableIndex: Int = 0
     @State private var isCalendarShow: Bool = false
+    @State private var toast: Toast? = nil
     
     @StateObject private var toDoListViewModel = ToDoListViewModel()
+    @StateObject private var calendarViewModel: CalendarViewModel = CalendarViewModel()
+    
     @Binding var toDoListData: ToDoListData
     
     
@@ -61,7 +64,6 @@ struct ToDoDataResultListView: View {
                                                 .foregroundColor(Color("1F2020"))
                                                 .italic()
                                                 .padding(.trailing, 10)
-                                            
                                         }
                                     }
                                 }
@@ -83,7 +85,51 @@ struct ToDoDataResultListView: View {
                     }
                     Spacer()
                 } else {
-                    WeekdayHeaderView()
+                    VStack {
+                        CalendarView(calendarViewModel: calendarViewModel, toDoListData: toDoListData)
+                        
+                        List {
+                            ForEach(toDoListViewModel.toDoListCompletionList.indices, id: \.self) { index in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 5) {
+                                        Text("시작 시간")
+                                            .font(.custom("GmarketSansTTFMedium", size: 16))
+                                            .foregroundColor(Color("1F2020")).opacity(0.6)
+                                        
+                                        Text(toDoListViewModel.toDoListCompletionList[index].date.HHmm)
+                                            .font(.custom("GmarketSansTTFBold", size: 18))
+                                            .foregroundColor(Color("1F2020"))
+                                    }
+                                    .padding(.leading, 10)
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(String(format: "%02d분", toDoListViewModel.toDoListCompletionList[index].selectedMinute))")
+                                        .font(.custom("GmarketSansTTFMedium", size: 18))
+                                        .monospacedDigit()
+                                        .background(.clear)
+                                        .foregroundColor(Color("1F2020"))
+                                        .italic()
+                                        .padding(.trailing, 10)
+                                }
+                            }
+                        }
+                        .padding(.top)
+                        .overlay {
+                            VStack(alignment: .center) {
+                                Spacer()
+                                
+                                Image("icon_list_empty")
+                                    .resizable()
+                                    .frame(width: 280, height: 187)
+                                
+                                Spacer()
+                            }
+                            .opacity(self.toDoListViewModel.toDoListCompletionList.isEmpty ? 1 : 0)
+                        }
+                        
+                        Spacer()
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -128,6 +174,29 @@ struct ToDoDataResultListView: View {
                 weekDayTableIndex = Calendar.current.component(.weekday, from: Date()) - 1
                 fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[weekDayTableIndex])
             }
+            .onReceive(futureDaySelected) {
+                toast = Toast(type: .warning, title: "", message: "미래는 확인할 수 없습니다.")
+            }
+            .onReceive(expandDaySelected) { isPreviousDay in
+                if isPreviousDay {
+                    calendarViewModel.currentMonth -= 1
+                    calendarViewModel.selectedMonth -= 1
+                } else {
+                    let selectyear = Calendar.current.component(.year, from: calendarViewModel.currentDate)
+                    let selectMonth = Calendar.current.component(.month, from: calendarViewModel.currentDate)
+                    
+                    if selectyear == Config.CALENDAR_START_YEAR && selectMonth == 1 {
+                        
+                    } else {
+                        calendarViewModel.currentMonth += 1
+                        calendarViewModel.selectedMonth += 1
+                    }
+                }
+            }
+            .onChange(of: calendarViewModel.selectDate) { oldDate, newDate in
+                toDoListViewModel.fetchToDoListForDate(toDoListData, newDate)
+            }
+            .toastView(toast: $toast)
         }
     }
     

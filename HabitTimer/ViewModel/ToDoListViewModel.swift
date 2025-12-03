@@ -62,6 +62,17 @@ class ToDoListViewModel: ObservableObject {
         self.toDoListSectionCompletionList = toDoListDateArr
     }
     
+    func fetchToDoListForDate(_ toDoListData: ToDoListData, _ date: Date) {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        
+        guard let toDoListItems = Array(results).filter({$0.id == toDoListData.id}).first?.toDoListItems else { return }
+        let toDoListCompletionList = Array(toDoListItems).filter({$0.date.yyyyMMdd == date.yyyyMMdd && $0.isDone == true && $0.selectedMinute > 0})
+        
+        self.toDoListCompletionList = toDoListCompletionList
+        
+    }
+    
     func fetchAllToDoListForWeekDay(_ weekString: String) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)

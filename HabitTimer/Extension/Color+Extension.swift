@@ -36,6 +36,21 @@ extension Color {
     /// Gray1
     static let symGray1 = Color.init(hex: "F3F5F8")
     
+    static let main_FF7E7E = Color.init(hex: "FF7E7E")
+    static let sub_FFA9A9 = Color.init(hex: "FF9A9A")
+    static let medium_FFF0F0 = Color.init(hex: "FFF0F0")
+    static let bright_FFF3F3 = Color.init(hex: "FFF3F3")
+    
+    // gray scale
+    static let black2D2D2D = Color.init(hex: "2D2D2D")
+    static let gray6_42454A = Color.init(hex: "42454A")
+    static let gray5_69707B = Color.init(hex: "69707B")
+    static let gray4_9BA3AE = Color.init(hex: "9BA3AE")
+    static let gray3_CCD2DA = Color.init(hex: "CCD2DA")
+    static let gray2_E8EAED = Color.init(hex: "E8EAED ")
+    static let gray1_F3F5F8 = Color.init(hex: "F3F5F8")
+    
+    
     static var random: Color {
         return Color(
             red: .random(in: 0...1),
