@@ -172,17 +172,23 @@ class ToDoListViewModel: ObservableObject {
         print("getToDoListForWeekDays toDoListData.setWeekDays: \(toDoListData.setWeekDays)")
         
         switch toDoListData.setWeekDays {
-        case 1: return "일"
-        case 2: return "월"
-        case 4: return "화"
-        case 8: return "수"
-        case 16: return "목"
-        case 32: return "금"
         case 62: return WeekDayExpireDate.주중.rawValue
-        case 64: return "토"
         case 65: return WeekDayExpireDate.주말.rawValue
         case 127: return WeekDayExpireDate.매일.rawValue
-        default: return ""
+        default:
+            return getToDoListWeekDayToString(toDoListData: toDoListData)
         }
+    }
+    
+    func getToDoListWeekDayToString(toDoListData: ToDoListData) -> String {
+        var weekDayStringArr: [String] = []
+
+        for weekValue in WeekDayValue.allCases {
+            if toDoListData.setWeekDays & weekValue.rawValue != 0 {
+                weekDayStringArr.append(WeekDayValue.getWeekDayCaseToString(weekValue.rawValue))
+            }
+        }
+        
+        return weekDayStringArr.joined(separator: ",")
     }
 }

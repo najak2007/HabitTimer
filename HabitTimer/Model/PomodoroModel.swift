@@ -38,7 +38,7 @@ struct WeekDayItem: Identifiable {
     var isSelected: Bool = false
 }
 
-enum WeekDayValue: Int {
+enum WeekDayValue: Int, CaseIterable {
     case 한번 = 0x0000
     case 일 = 0x0001
     case 월 = 0x0002
@@ -68,6 +68,27 @@ enum WeekDayValue: Int {
             return WeekDayValue.토.rawValue
         default:
             return 0x0000
+        }
+    }
+    
+    static func getWeekDayCaseToString(_ weekDayValue: Int) -> String {
+        switch weekDayValue {
+        case WeekDayValue.일.rawValue:
+            return "일"
+        case WeekDayValue.월.rawValue:
+            return "월"
+        case WeekDayValue.화.rawValue:
+            return "화"
+        case WeekDayValue.수.rawValue:
+            return "수"
+        case WeekDayValue.목.rawValue:
+            return "목"
+        case WeekDayValue.금.rawValue:
+            return "금"
+        case WeekDayValue.토.rawValue:
+            return "토"
+        default:
+            return ""
         }
     }
     
