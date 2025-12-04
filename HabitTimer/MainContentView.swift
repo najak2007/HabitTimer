@@ -78,6 +78,10 @@ struct PostitListView: View {
                                         }
                                         .frame(width: 40, height: 40)
 #endif
+                                    Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
+                                        .font(.custom("GmarketSansTTFMedium", size: 14))
+                                        .foregroundColor(.black)
+                                    
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)

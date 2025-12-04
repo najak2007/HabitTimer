@@ -17,6 +17,8 @@ struct PomodoroSettingView: View {
     
     @Binding var isAlarmStatus: Bool
     @Binding var isFullScreen: Bool
+    @Binding var weekDays: Int
+    @Binding var weekDaysList: [WeekDayItem]
     
     @State private var toast: Toast? = nil
     
@@ -111,22 +113,35 @@ struct PomodoroSettingView: View {
                 }
             }
             
-            Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
+            Section(header: PomodoroListHeaderView(headerText: "요일 설정", showAlignments: .좌측정렬)) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 3) {
-                        ForEach(Config.WEEKDAY_TITLE.indices, id: \.self) { index in
-                            Text(Config.WEEKDAY_TITLE[index])
+                        ForEach(weekDaysList.indices, id: \.self) { index in
+                            Text(weekDaysList[index].weekDay)
                                 .font(.custom("GmarketSansTTFMedium", size: 16))
                                 .foregroundStyle(Color("1F2020"))
                                 .padding()
-                                .background(.clear)
+                                .background(weekDaysList[index].isSelected ? Color.errorGreen : Color .clear)
                                 .cornerRadius(16)
+                                .onTapGesture {
+                                    var newWeekDayItem = weekDaysList[index]
+                                    newWeekDayItem.isSelected.toggle()
+                                    weekDaysList[index] = newWeekDayItem
+                                    
+                                    if newWeekDayItem.isSelected == true {
+                                        self.weekDays = self.weekDays | WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay)
+                                    } else {
+                                        self.weekDays = self.weekDays ^ WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay)
+                                    }
+                                }
                         }
                     }
                     .padding(.horizontal, 5)
                 }
                 .scrollDisabled(true)
-                
+            }
+            
+            Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
                 
                 Button(action: {
                     
@@ -183,4 +198,10 @@ struct PomodoroSettingView: View {
         .environment(\.defaultMinListRowHeight, 80)
         .scrollDisabled(true)
     }
+
+    func bind() {
+        
+    }
+    
+
 }
