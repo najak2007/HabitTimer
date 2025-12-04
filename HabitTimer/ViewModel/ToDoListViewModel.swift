@@ -133,6 +133,19 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
+    func updateToWeekDays(toDoListData: ToDoListData, updateWeekDay: Int) {
+        guard let realm = realm else { return }
+        
+        do {
+            try realm.write {
+                toDoListData.setWeekDays = updateWeekDay
+                fetchToDoList()
+            }
+        } catch {
+            
+        }
+    }
+    
     func addCompletionToDoItem(toDoListData: ToDoListData, toDoListCompletion: ToDoListCompletion) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
@@ -144,6 +157,32 @@ class ToDoListViewModel: ObservableObject {
                 fetchToDoList()
             }
         }catch {
+        }
+    }
+    
+    func getSelectWeekDayValue(_ weekDayValue: Int, weekDay: String) -> Bool {
+        if weekDayValue & WeekDayValue.getWeekDayForString(weekDay) != 0 {
+            return true
+        }
+        return false
+    }
+    
+    func getToDoListForWeekDays(toDoListData: ToDoListData) -> String {
+        
+        print("getToDoListForWeekDays toDoListData.setWeekDays: \(toDoListData.setWeekDays)")
+        
+        switch toDoListData.setWeekDays {
+        case 1: return "일"
+        case 2: return "월"
+        case 4: return "화"
+        case 8: return "수"
+        case 16: return "목"
+        case 32: return "금"
+        case 62: return WeekDayExpireDate.주중.rawValue
+        case 64: return "토"
+        case 65: return WeekDayExpireDate.주말.rawValue
+        case 127: return WeekDayExpireDate.매일.rawValue
+        default: return ""
         }
     }
 }

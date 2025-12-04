@@ -40,6 +40,8 @@ struct PomodoroView: View {
     @State private var isFullScreen: Bool = false
     @State private var timeRemaining: Double = Double(Config.POMODORO_WORK_TIME_MINUTE) * Config.POMODORO_TIME_MINUTE
     @State private var pomodoroScenePhase: ScenePhase? = nil
+    @State private var weekDays: Int = 0
+    @State private var weekDaysList: [WeekDayItem] = []
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -340,10 +342,13 @@ struct PomodoroView: View {
                     }
                 
                 if self.isMenuShow {
-                    BottomSheetView($isMenuShow, height: 510) {
+                    BottomSheetView($isMenuShow, height: 550) {
                         VStack {
-                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAlarmStatus: $isAlarmStatus, isFullScreen: $isFullScreen)
+                            PomodoroSettingView(focusTime: minuteValue, breakTime: minuteBreakValue, isAlarmStatus: $isAlarmStatus, isFullScreen: $isFullScreen, weekDays: $weekDays, weekDaysList: $weekDaysList)
                         }
+                    }
+                    .onChange(of: weekDays) { oldValue, newValue in
+                        toDoListViewModel.updateToWeekDays(toDoListData: toDoListData, updateWeekDay: newValue)
                     }
                 }
             }
@@ -417,7 +422,14 @@ struct PomodoroView: View {
         self.selectedMinute = toDoListData.selectedMinute
         self.minuteValue = self.selectedMinute
         self.minuteBreakValue = toDoListData.breakMinute
+        self.weekDays = toDoListData.setWeekDays
         
+        for index in 0..<Config.WEEKDAY_TITLE.count {
+            let isSelected: Bool = toDoListViewModel.getSelectWeekDayValue(toDoListData.setWeekDays, weekDay: Config.WEEKDAY_TITLE[index])
+            let weekDayItem: WeekDayItem = WeekDayItem(weekDay: Config.WEEKDAY_TITLE[index], isSelected: isSelected)
+            self.weekDaysList.insert(weekDayItem, at: index)
+        }
+
         UserDefaults.standard.removeObject(forKey: Config.TIMEREMAING_SAVE_ID)
     }
     
