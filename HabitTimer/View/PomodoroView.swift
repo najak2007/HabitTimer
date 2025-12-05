@@ -365,7 +365,7 @@ struct PomodoroView: View {
             getSecondTimeToMinuteTime()
         }
         .onChange(of: scenePhase) { oldValue, newValue in
-            print("oldValue = \(oldValue), newValue = \(newValue)")
+            print("PomodoroView oldValue = \(oldValue), newValue = \(newValue)")
 
             if oldValue == .inactive, newValue == .background {
                 if (pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중), self.timeRemaining >  2 {

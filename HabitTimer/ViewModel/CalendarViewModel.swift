@@ -141,4 +141,29 @@ final class CalendarViewModel: ObservableObject {
         
         return false
     }
+    
+    static func timeRemainingUntilMidnight() -> Int? {
+        let now = Date()
+        let calendar = Calendar.current
+
+        guard let nextMidnight = calendar.nextDate(
+            after: now,
+            matching: DateComponents(hour: 0, minute: 0, second: 0),
+            matchingPolicy: .nextTime
+        ) else {
+            return nil
+        }
+        
+        let timeInterval = nextMidnight.timeIntervalSince(now)
+        
+        let components = calendar.dateComponents([.hour, .minute, .second], from: now, to: nextMidnight)
+        
+        guard let hours = components.hour, let minutes = components.minute, let seconds = components.second else {
+            return nil
+        }
+
+        print("hours = \(hours), minutes = \(minutes), seconds = \(seconds)")
+        
+        return timeInterval.isNaN ? nil : Int(timeInterval)
+    }
 }

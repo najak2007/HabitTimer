@@ -135,6 +135,9 @@ struct ToDoDataResultListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 leading: Button(action: {
+                    if self.isCalendarShow == false {
+                        toDoListViewModel.fetchToDoListForDate(toDoListData, calendarViewModel.selectDate)
+                    }
                     self.isCalendarShow.toggle()
                 }, label: {
                     if self.isCalendarShow {
