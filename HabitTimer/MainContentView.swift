@@ -18,6 +18,7 @@ struct PostitListView: View {
     ]
  
     @StateObject private var toDoListViewModel = ToDoListViewModel()
+    @State private var midnightWorkItem: DispatchWorkItem?
     @State private var messageText: String = ""
     @State private var isFocused: Bool = false
     @State private var inputHeight: CGFloat = 42
@@ -34,12 +35,15 @@ struct PostitListView: View {
     @State private var messageTextEditorID: String = ""
     @State private var textWidth: CGFloat = 0
     @State private var date = Date()
+    @State private var backgroundDate: Date? = nil
+    @StateObject private var timerManager = TimerManager()
     
     @Namespace private var animation
     
     let notiManager = NotificationManager.instance
     
     let coloredNavAppearance = UINavigationBarAppearance()
+    @Environment(\.scenePhase) var scenePhase
     
     init() {
         coloredNavAppearance.configureWithOpaqueBackground()
@@ -63,9 +67,7 @@ struct PostitListView: View {
                             
                             
                             VStack(alignment: .trailing) {
-                                HStack(spacing: 15) {
-                                    Spacer()
-                                    
+                                HStack {
 #if __NOT_USE__
                                     Image(systemName: "siri")
                                         .resizable()
@@ -80,6 +82,14 @@ struct PostitListView: View {
 #endif
 
 #if __NOT_USE__
+                                    TextWithBoldedSubstring(originalText: toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]), boldedSubstring: Date().weekDay)
+                                        .padding(.vertical, 5)
+                                        .padding(.horizontal, 8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
+                                        )
+#else
                                     Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
                                         .font(.custom("GmarketSansTTFMedium", size: 15))
                                         .foregroundColor(.black)
@@ -89,14 +99,8 @@ struct PostitListView: View {
                                             RoundedRectangle(cornerRadius: 16)
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 1)
                                         )
-#else
-                                    TextWithBoldedSubstring(originalText: toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]), boldedSubstring: Date().weekDay)
-                                        .padding(.vertical, 5)
-                                        .padding(.horizontal, 8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
-                                        )
+                                        .padding(.leading, 62)
+                                    Spacer()
 #endif
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
@@ -287,9 +291,37 @@ struct PostitListView: View {
         .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
             ToDoDataResultListView(toDoListData: $toDoListViewModel.selectedToDoListData)
         })
+        .onAppear {
+            timerManager.midnightCheckTimer()
+        }
+        .onReceive(midnightPassed) {
+            setDateChange()
+        }
+        .onChange(of: scenePhase) { oldValue, newValue in
+            print("MainContentView oldValue = \(oldValue), newValue = \(newValue)")
+            
+            if oldValue == .inactive, newValue == .background {
+                timerManager.midnightResetTimer()
+                self.backgroundDate = Date()
+                self.backgroundDate = CalendarViewModel().subtractDaysFromDate(days: 1, from: Date())
+            } else if oldValue == .background, newValue == .inactive {
+                if backgroundDate != nil {
+                    if backgroundDate?.yyyyMMdd != Date().yyyyMMdd {
+ //                       setDateChange()
+                    }
+                }
+                backgroundDate = nil
+                timerManager.midnightCheckTimer()
+            }
+        }
         .toastView(toast: $toast)
 
         .ignoresSafeArea()
+    }
+    
+    private func setDateChange() {
+        self.date = Date()
+        bind()
     }
     
     func getImageName(index: Int) -> String {

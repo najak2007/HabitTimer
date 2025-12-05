@@ -12,6 +12,7 @@ class TimerManager: ObservableObject {
     @Published var timeRemaining: Double = 0
     @Published var isPaused: Bool = true
     private var timer: Timer?
+    private var midnightTimer: Timer?
     
     func startTimer() {
         if timer == nil {
@@ -44,5 +45,22 @@ class TimerManager: ObservableObject {
         timer?.invalidate()
         timer = nil
         isPaused = true
+    }
+    
+    func midnightCheckTimer() {
+        if midnightTimer == nil {
+            guard let timeRemaingInterval = CalendarViewModel.timeRemainingUntilMidnight() else {
+                return
+            }
+
+            midnightTimer = Timer.scheduledTimer(withTimeInterval: Double(timeRemaingInterval), repeats: false) { _ in
+                midnightPassed.send()
+            }
+        }
+    }
+    
+    func midnightResetTimer() {
+        midnightTimer?.invalidate()
+        midnightTimer = nil
     }
 }

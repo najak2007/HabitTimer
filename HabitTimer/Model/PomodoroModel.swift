@@ -10,6 +10,7 @@ import Combine
 import RealmSwift
 
 var minutePassed = PassthroughSubject<Int, Never>()
+var midnightPassed = PassthroughSubject<Void, Never>()
 
 var pomodoroStartMode = PassthroughSubject<Bool, Never>()
 

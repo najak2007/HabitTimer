@@ -28,13 +28,16 @@ class ToDoListViewModel: ObservableObject {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
         
+#if __NOT_USE__
         if date.yyyyMMdd == Date().yyyyMMdd {
             toDoList = Array(results)
             return
         }
         
         toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
-        
+#else
+        toDoList = Array(results).filter { $0.setWeekDays & Int(WeekDayValue.getWeekDayForDate(date)) != 0 }
+#endif
     }
     
     func fetchToDoListForWeekDay(_ toDoListData: ToDoListData, _ weekString: String) {
@@ -168,9 +171,6 @@ class ToDoListViewModel: ObservableObject {
     }
     
     func getToDoListForWeekDays(toDoListData: ToDoListData) -> String {
-        
-        print("getToDoListForWeekDays toDoListData.setWeekDays: \(toDoListData.setWeekDays)")
-        
         switch toDoListData.setWeekDays {
         case 62: return WeekDayExpireDate.주중.rawValue
         case 65: return WeekDayExpireDate.주말.rawValue

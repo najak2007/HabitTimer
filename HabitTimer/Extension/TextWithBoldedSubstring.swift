@@ -15,9 +15,9 @@ struct TextWithBoldedSubstring: View {
     
     var body: some View {
         if let boldedRange = originalText.range(of: boldedSubstring) {
-            var beforeRange = originalText[..<boldedRange.lowerBound]
-            var boldedText = originalText[boldedRange]
-            var afterRange = originalText[boldedRange.upperBound...]
+            let beforeRange = originalText[..<boldedRange.lowerBound]
+            let boldedText = originalText[boldedRange]
+            let afterRange = originalText[boldedRange.upperBound...]
             
             return Text(beforeRange)
                 .font(.custom("GmarketSansTTFMedium", size: 15))
@@ -29,17 +29,6 @@ struct TextWithBoldedSubstring: View {
                 .font(.custom("GmarketSansTTFMedium", size: 15))
                 .foregroundColor(.black)
         } else {
-            if let subRange = originalText.range(of: sunString) {
-                let beforeRange = originalText[..<subRange.lowerBound]
-                let boldedText = originalText[subRange]
-                let afterRange = originalText[subRange.upperBound...]
-                
-                return Text(beforeRange)
-                    .font(.custom("GmarketSansTTFMedium", size: 15))
-                    .foregroundColor(.black)
-            }
-            
-            
             return Text(originalText)
                 .font(.custom("GmarketSansTTFMedium", size: 15))
         }
