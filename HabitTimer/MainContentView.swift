@@ -303,11 +303,10 @@ struct PostitListView: View {
             if oldValue == .inactive, newValue == .background {
                 timerManager.midnightResetTimer()
                 self.backgroundDate = Date()
-                self.backgroundDate = CalendarViewModel().subtractDaysFromDate(days: 1, from: Date())
             } else if oldValue == .background, newValue == .inactive {
                 if backgroundDate != nil {
                     if backgroundDate?.yyyyMMdd != Date().yyyyMMdd {
- //                       setDateChange()
+                        setDateChange()
                     }
                 }
                 backgroundDate = nil
