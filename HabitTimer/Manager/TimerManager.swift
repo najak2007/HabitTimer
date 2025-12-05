@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import UIKit
 
 class TimerManager: ObservableObject {
     @Published var timeRemaining: Double = 0
@@ -16,6 +17,9 @@ class TimerManager: ObservableObject {
     
     func startTimer() {
         if timer == nil {
+            
+            UIApplication.shared.isIdleTimerDisabled = true
+            
             timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
                 
@@ -33,6 +37,8 @@ class TimerManager: ObservableObject {
         timer?.invalidate()
         timer = nil
         isPaused = true
+
+        UIApplication.shared.isIdleTimerDisabled = false
     }
     
     func resumeTimer() {
@@ -45,6 +51,8 @@ class TimerManager: ObservableObject {
         timer?.invalidate()
         timer = nil
         isPaused = true
+        
+        UIApplication.shared.isIdleTimerDisabled = false
     }
     
     func midnightCheckTimer() {
