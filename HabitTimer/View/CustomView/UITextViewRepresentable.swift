@@ -22,6 +22,7 @@ struct UITextViewRepresentable: UIViewRepresentable {
         textView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         textView.layer.borderWidth = 1.0
         textView.layer.borderColor = UIColor.darkGray.cgColor
+        textView.backgroundColor = UIColor.white
         textView.layer.cornerRadius = 8.0
         textView.layer.masksToBounds = true
         textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)

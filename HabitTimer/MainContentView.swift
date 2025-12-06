@@ -67,7 +67,7 @@ struct PostitListView: View {
                             
                             
                             VStack(alignment: .trailing) {
-                                HStack {
+                                HStack(spacing: 10){
 #if __NOT_USE__
                                     Image(systemName: "siri")
                                         .resizable()
@@ -90,17 +90,18 @@ struct PostitListView: View {
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 1)
                                         )
 #else
+                                    Spacer()
+                                    
                                     Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
                                         .font(.custom("GmarketSansTTFMedium", size: 15))
                                         .foregroundColor(.black)
+                                        .frame(minWidth: 20)
                                         .padding(.vertical, 5)
                                         .padding(.horizontal, 8)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 16)
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 1)
                                         )
-                                        .padding(.leading, 62)
-                                    Spacer()
 #endif
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
@@ -238,8 +239,13 @@ struct PostitListView: View {
                         
                         HStack(spacing: 10) {
                             VStack(alignment: .leading, spacing: 0) {
+#if __NOT_USE__
                                 UITextViewRepresentable(text: $messageText, isFocused: $isFocused, inputHeight: $inputHeight)
                                     .frame(height: inputHeight)
+#else
+                                UITextViewRepresentable(text: $messageText, isFocused: $isAddToDoListShow, inputHeight: $inputHeight)
+                                    .frame(height: inputHeight)
+#endif
                             }
                             
                             Button(action: {

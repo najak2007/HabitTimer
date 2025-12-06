@@ -125,14 +125,19 @@ struct PomodoroSettingView: View {
                                 .cornerRadius(16)
                                 .onTapGesture {
                                     var newWeekDayItem = weekDaysList[index]
-                                    newWeekDayItem.isSelected.toggle()
-                                    weekDaysList[index] = newWeekDayItem
                                     
-                                    if newWeekDayItem.isSelected == true {
+                                    if newWeekDayItem.isSelected == false {
                                         self.weekDays = self.weekDays | WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay)
                                     } else {
-                                        self.weekDays = self.weekDays ^ WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay)
+                                        if self.weekDays == WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay) {
+                                            toast = Toast(type: .warning, title: "", message: "최소 한 요일을 선택하세요.", position: .center)
+                                            return
+                                        } else {
+                                            self.weekDays = self.weekDays ^ WeekDayValue.getWeekDayForString(weekDaysList[index].weekDay)
+                                        }
                                     }
+                                    newWeekDayItem.isSelected.toggle()
+                                    weekDaysList[index] = newWeekDayItem
                                 }
                         }
                     }
