@@ -119,7 +119,6 @@ struct PostitListView: View {
                                 Spacer()
                             }
                             
-                            
                             Text(toDoListViewModel.toDoList[index].messageText)
                                 .font(.custom("GmarketSansTTFMedium", size: 24))
                                 .foregroundColor(.black)
@@ -135,6 +134,10 @@ struct PostitListView: View {
                             self.toDoListViewModel.selectedToDoListData = toDoListViewModel.toDoList[index]
                             self.toDoListViewModel.selectedIndex = index
                             self.isPomodoroShow.toggle()
+                            
+                            if self.isPomodoroShow == true {
+                                self.isAddToDoListShow = false
+                            }
                         }
                         .id(toDoListViewModel.toDoList[index].id)
                     }
