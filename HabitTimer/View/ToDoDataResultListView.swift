@@ -44,9 +44,9 @@ struct ToDoDataResultListView: View {
                                 Section(header: PomodoroListHeaderView(headerText: self.getToDoListSectionTitle( toDoListViewModel.toDoListSectionCompletionList[sectionIndex].first), showAlignments: .가운데정렬)) {
                                     ForEach(toDoListViewModel.toDoListSectionCompletionList[sectionIndex].indices, id: \.self) { index in
                                         HStack {
-                                            VStack(alignment: .leading, spacing: 5) {
+                                            VStack(alignment: .center, spacing: 8) {
                                                 Text("시작 시간")
-                                                    .font(.custom("GmarketSansTTFMedium", size: 16))
+                                                    .font(.custom("GmarketSansTTFMedium", size: 14))
                                                     .foregroundColor(Color("1F2020")).opacity(0.6)
                                                 
                                                 Text(toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].date.HHmm)
@@ -56,14 +56,19 @@ struct ToDoDataResultListView: View {
                                             .padding(.leading, 10)
                                             
                                             Spacer()
-                                            
-                                            Text("\(String(format: "%02d분", toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].selectedMinute))")
-                                                .font(.custom("GmarketSansTTFMedium", size: 18))
-                                                .monospacedDigit()
-                                                .background(.clear)
-                                                .foregroundColor(Color("1F2020"))
-                                                .italic()
-                                                .padding(.trailing, 10)
+                                            VStack(alignment: .center, spacing: 8) {
+                                                Text("집중 시간")
+                                                    .font(.custom("GmarketSansTTFMedium", size: 14))
+                                                    .foregroundColor(Color("1F2020")).opacity(0.6)
+                                                
+                                                Text("\(String(format: "%02d분", toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].selectedMinute))")
+                                                    .font(.custom("GmarketSansTTFMedium", size: 18))
+                                                    .monospacedDigit()
+                                                    .background(.clear)
+                                                    .foregroundColor(Color("1F2020"))
+                                                    .italic()
+                                                    .padding(.trailing, 10)
+                                            }
                                         }
                                     }
                                 }
