@@ -37,9 +37,13 @@ struct UITextViewRepresentable: UIViewRepresentable {
         uiView.text = self.text
         
         if isFocused {
-            uiView.becomeFirstResponder()
+            DispatchQueue.main.async {
+                uiView.becomeFirstResponder()
+            }
         } else {
-            uiView.resignFirstResponder()
+            DispatchQueue.main.async {
+                uiView.resignFirstResponder()
+            }
         }
     }
     
