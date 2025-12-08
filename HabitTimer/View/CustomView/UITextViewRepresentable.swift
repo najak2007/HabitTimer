@@ -36,12 +36,10 @@ struct UITextViewRepresentable: UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: UIViewRepresentableContext<UITextViewRepresentable>) {
         uiView.text = self.text
         
-        if isFocused {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            if isFocused {
                 uiView.becomeFirstResponder()
-            }
-        } else {
-            DispatchQueue.main.async {
+            } else {
                 uiView.resignFirstResponder()
             }
         }
