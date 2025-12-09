@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import HapticsManager
 
 struct PostitListView: View {
     let postItName = [
@@ -35,7 +35,12 @@ struct PostitListView: View {
     @State private var messageTextEditorID: String = ""
     @State private var textWidth: CGFloat = 0
     @State private var date = Date()
+    @State private var isOnlyWeekDayShow: Bool = true
     @State private var backgroundDate: Date? = nil
+
+    @State private var backgroundDateText: String = ""
+
+    
     @StateObject private var timerManager = TimerManager()
     
     @Namespace private var animation
@@ -90,6 +95,11 @@ struct PostitListView: View {
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 1)
                                         )
 #else
+                                    Text(toDoListViewModel.toDoList[index].createDate.MMddDot)
+                                        .font(.custom("GmarketSansTTFMedium", size: 15))
+                                        .foregroundColor(.black)
+                                        .padding(.leading, 65)
+                                    
                                     Spacer()
                                     
                                     Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
@@ -182,7 +192,7 @@ struct PostitListView: View {
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
                                 .foregroundColor(.black)
                                 .onChange(of: date) { oldValue, newValue in
-                                    bind(oldValue != newValue)
+                                    bind()
                                 }
                             
                             Image(systemName: "arrowtriangle.down.circle")
@@ -223,7 +233,7 @@ struct PostitListView: View {
                 .scrollContentBackground(.hidden)
                 .background(.white)
                 .contentMargins(.horizontal, 0)
-                .padding(.top, -34)
+//                .padding(.top, -34)
                 .overlay {
                     VStack(alignment: .center) {
                         Spacer()
@@ -236,6 +246,34 @@ struct PostitListView: View {
                     }
                     .opacity(self.toDoListViewModel.toDoList.isEmpty ? 1 : 0)
                 }
+                .overlay {
+                    VStack {
+                        HStack(spacing: 5) {
+                            Spacer()
+                            
+                            Text("요일별")
+                                .font(.custom("GmarketSansTTFMedium", size: 16))
+                        
+                            Toggle(isOn: $isOnlyWeekDayShow) {
+
+                            }
+                            .labelsHidden()
+                            .controlSize(ControlSize.mini)
+                            .onChange(of: isOnlyWeekDayShow) { oldValue, newValue in
+                                bind()
+                            }
+                            .hapticFeedback(.impact(.medium), trigger: isOnlyWeekDayShow)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.top, -34)
+                        
+                        Spacer()
+                        
+                        Text("backgroundDateText = \(backgroundDateText) self.date = \(self.date.yyMMddDot )")
+                    }
+                }
+                
+                
                 .overlay {
                     VStack(spacing: 10) {
                         Spacer()
@@ -312,6 +350,11 @@ struct PostitListView: View {
             if oldValue == .inactive, newValue == .background {
                 timerManager.midnightResetTimer()
                 self.backgroundDate = Date()
+                
+                self.backgroundDateText = self.backgroundDate?.yyMMddDot ?? ""
+#if DEBUG_USE
+                self.backgroundDate = CalendarViewModel().subtractDaysFromDate(days: 1, from: Date())
+#endif
             } else if oldValue == .background, newValue == .inactive {
                 if backgroundDate != nil {
                     if backgroundDate?.yyyyMMdd != Date().yyyyMMdd {
@@ -354,7 +397,7 @@ struct PostitListView: View {
     }
     
     func bind(_ isLoading: Bool = false) {
-        toDoListViewModel.fetchToDoList(date)
+        toDoListViewModel.fetchToDoList(date, isOnlyWeekDayShow)
     }
 }
 

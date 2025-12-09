@@ -32,6 +32,7 @@ enum DateFormat: String {
     case yearWeek = "yyyyw"
     case ahmm = "a' 'h':'mm"
     case yearKR = "yyyy'년"
+    case MMddDot = "MM.dd"
 }
 
 enum TimeZoneFormat: String {
@@ -124,6 +125,10 @@ extension Date {
     
     var Mde: String {
         return asString(format: .Mde)
+    }
+    
+    var MMddDot: String {
+        return asString(format: .MMddDot)
     }
     
     var yyMMdd: String{
