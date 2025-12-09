@@ -98,7 +98,7 @@ struct PostitListView: View {
                                     Text(toDoListViewModel.toDoList[index].createDate.MMddDot)
                                         .font(.custom("GmarketSansTTFMedium", size: 15))
                                         .foregroundColor(.black)
-                                        .padding(.leading, 62)
+                                        .padding(.leading, 65)
                                     
                                     Spacer()
                                     
