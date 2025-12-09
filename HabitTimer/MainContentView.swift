@@ -95,11 +95,6 @@ struct PostitListView: View {
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 1)
                                         )
 #else
-                                    Text(toDoListViewModel.toDoList[index].createDate.MMddDot)
-                                        .font(.custom("GmarketSansTTFMedium", size: 15))
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 65)
-                                    
                                     Spacer()
                                     
                                     Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
@@ -150,6 +145,27 @@ struct PostitListView: View {
                             }
                         }
                         .id(toDoListViewModel.toDoList[index].id)
+                        .overlay {
+                            VStack {
+                                HStack {
+                                    Text(toDoListViewModel.toDoList[index].createDate.MMddDot)
+                                        .font(.custom("GmarketSansTTFBold", size: 15))
+                                        .foregroundColor(.black)
+                                        .padding(.vertical, 5)
+                                        .padding(.horizontal, 8)
+//                                        .overlay(
+//                                            RoundedRectangle(cornerRadius: 16)
+//                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
+//                                        )
+                                        .padding(.top, 25)
+                                        .padding(.leading, 48)
+                                        
+                                    Spacer()
+                                }
+                                
+                                Spacer()
+                            }
+                        }
                     }
                     .onDelete(perform: deleteItems)
                 }
@@ -173,16 +189,27 @@ struct PostitListView: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         if self.editMode == .inactive {
                             Button(action: {
-                                withAnimation(.easeIn(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
-                                    self.isAddToDoListShow.toggle()
+                                if date.yyyyMMdd == Date().yyyyMMdd {
+                                    withAnimation(.easeIn(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
+                                        self.isAddToDoListShow.toggle()
+                                    }
+                                } else {
+                                    setDateChange()
                                 }
                             }, label: {
-                                Image(systemName: "square.and.pencil")
-                                    .resizable()
-                                    .frame(width: 25, height: 25)
-                                    .foregroundColor(Color("1F2020"))
+                                if date.yyyyMMdd == Date().yyyyMMdd {
+                                    Image(systemName: "square.and.pencil")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(Color("1F2020"))
+                                } else {
+                                    Text("오늘")
+                                        .font(.custom("GmarketSansTTFMedium", size: 15))
+                                        .foregroundColor(Color("1F2020"))
+                                }
                             })
                             .buttonStyle(PlainButtonStyle())
+                            
                         }
                     }
                     
