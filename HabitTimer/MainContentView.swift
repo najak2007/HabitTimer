@@ -105,7 +105,7 @@ struct PostitListView: View {
                                         .padding(.horizontal, 8)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 16)
-                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
+                                                .stroke(Color.black.opacity(0.6), lineWidth: 0.8)
                                         )
 #endif
                                     Image(systemName: "ellipsis.circle")

@@ -62,13 +62,13 @@ struct ToDoDataResultListView: View {
                                                     .foregroundColor(Color("1F2020")).opacity(0.6)
                                                 
                                                 Text("\(String(format: "%02d분", toDoListViewModel.toDoListSectionCompletionList[sectionIndex][index].selectedMinute))")
-                                                    .font(.custom("GmarketSansTTFMedium", size: 18))
+                                                    .font(.custom("GmarketSansTTFBold", size: 18))
                                                     .monospacedDigit()
                                                     .background(.clear)
                                                     .foregroundColor(Color("1F2020"))
                                                     .italic()
-                                                    .padding(.trailing, 10)
                                             }
+                                            .padding(.trailing, 10)
                                         }
                                     }
                                 }
@@ -98,7 +98,7 @@ struct ToDoDataResultListView: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 5) {
                                         Text("시작 시간")
-                                            .font(.custom("GmarketSansTTFMedium", size: 16))
+                                            .font(.custom("GmarketSansTTFMedium", size: 14))
                                             .foregroundColor(Color("1F2020")).opacity(0.6)
                                         
                                         Text(toDoListViewModel.toDoListCompletionList[index].date.HHmm)
@@ -109,13 +109,20 @@ struct ToDoDataResultListView: View {
                                     
                                     Spacer()
                                     
-                                    Text("\(String(format: "%02d분", toDoListViewModel.toDoListCompletionList[index].selectedMinute))")
-                                        .font(.custom("GmarketSansTTFMedium", size: 18))
-                                        .monospacedDigit()
-                                        .background(.clear)
-                                        .foregroundColor(Color("1F2020"))
-                                        .italic()
-                                        .padding(.trailing, 10)
+                                    VStack(alignment: .center, spacing: 8) {
+                                        Text("집중 시간")
+                                            .font(.custom("GmarketSansTTFMedium", size: 14))
+                                            .foregroundColor(Color("1F2020")).opacity(0.6)
+                                        
+                                        
+                                        Text("\(String(format: "%02d분", toDoListViewModel.toDoListCompletionList[index].selectedMinute))")
+                                            .font(.custom("GmarketSansTTFBold", size: 18))
+                                            .monospacedDigit()
+                                            .background(.clear)
+                                            .foregroundColor(Color("1F2020"))
+                                            .italic()
+                                            .padding(.trailing, 10)
+                                    }
                                 }
                             }
                         }
@@ -142,6 +149,9 @@ struct ToDoDataResultListView: View {
                 leading: Button(action: {
                     if self.isCalendarShow == false {
                         toDoListViewModel.fetchToDoListForDate(toDoListData, calendarViewModel.selectDate)
+                    } else {
+                        weekDayTableIndex = Calendar.current.component(.weekday, from: calendarViewModel.selectDate) - 1
+                        fetchToDoListForWeekDay(Config.WEEKDAY_TITLE[weekDayTableIndex])
                     }
                     self.isCalendarShow.toggle()
                 }, label: {

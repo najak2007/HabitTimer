@@ -27,9 +27,9 @@ class Config {
     
     static let TODOLIST_ROW_HEIGHT: CGFloat = 340
     
-    static let POMODORO_WORK_TIME_MINUTE: Int = 3 //25
+    static let POMODORO_WORK_TIME_MINUTE: Int = 2 //25
     
-    static let POMODORO_BREAK_TIME_MINUTE: Int = 5
+    static let POMODORO_BREAK_TIME_MINUTE: Int = 1  // 5
     
     static let TODO_BUBBLE_WIDTH: CGFloat = 300
     
