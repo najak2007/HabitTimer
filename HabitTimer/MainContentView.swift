@@ -295,8 +295,9 @@ struct PostitListView: View {
                         .padding(.top, -34)
                         
                         Spacer()
-                        
+#if DEBUG
                         Text("backgroundDateText = \(backgroundDateText) self.date = \(self.date.yyMMddDot )")
+#endif
                     }
                 }
                 
