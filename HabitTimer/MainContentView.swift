@@ -153,10 +153,6 @@ struct PostitListView: View {
                                         .foregroundColor(.black)
                                         .padding(.vertical, 5)
                                         .padding(.horizontal, 8)
-//                                        .overlay(
-//                                            RoundedRectangle(cornerRadius: 16)
-//                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
-//                                        )
                                         .padding(.top, 25)
                                         .padding(.leading, 48)
                                         
