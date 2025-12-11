@@ -47,6 +47,7 @@ struct RoundedCorner: Shape {
 
 struct ClearButton: ViewModifier {
     @Binding var text: String
+    @Binding var isShow: Bool
     
     func body(content: Content) -> some View {
         HStack {
@@ -54,12 +55,16 @@ struct ClearButton: ViewModifier {
             
             if !text.isEmpty {
                 Button(action: {
-                    text = ""
+                    if isShow {
+                        text = ""
+                    }
                 }, label: {
-                    Image(systemName: "xmark.circle")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(Color("1F2020"))
+                    if isShow {
+                        Image(systemName: "xmark.circle")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(Color("1F2020"))
+                    }
                 })
                 .padding(.trailing, 10)
             }
@@ -105,8 +110,8 @@ extension View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
     }
     
-    func clearButton(text: Binding<String>) -> some View {
-        modifier(ClearButton(text: text))
+    func clearButton(text: Binding<String>, isShow: Binding<Bool>) -> some View {
+        modifier(ClearButton(text: text, isShow: isShow))
     }
     
     func navigationTitleColor(_ color: Color) -> some View {

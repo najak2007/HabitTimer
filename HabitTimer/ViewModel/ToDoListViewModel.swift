@@ -144,6 +144,26 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
+    func updateToMinuteTime(toDoListData: ToDoListData, updateMinute: Int, isBreakTime: Bool = false) -> ToDoListData {
+        guard let realm = realm else { return toDoListData }
+        let results = realm.objects(ToDoListData.self)
+        guard let updateToDoData = Array(results).filter({$0.id == toDoListData.id}).first else { return toDoListData }
+        
+        do {
+            try realm.write {
+                if isBreakTime == false {
+                    updateToDoData.selectedMinute = updateMinute
+                } else {
+                    updateToDoData.breakMinute = updateMinute
+                }
+                fetchToDoList()
+            }
+        } catch {
+            return toDoListData
+        }
+        return updateToDoData
+    }
+    
     func addCompletionToDoItem(toDoListData: ToDoListData, toDoListCompletion: ToDoListCompletion) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
