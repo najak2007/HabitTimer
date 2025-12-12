@@ -42,6 +42,7 @@ struct PomodoroView: View {
     @State private var pomodoroScenePhase: ScenePhase? = nil
     @State private var weekDays: Int = 0
     @State private var weekDaysList: [WeekDayItem] = []
+    @State private var isToDoListHistoryView: Bool = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
@@ -251,24 +252,36 @@ struct PomodoroView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 10)
  
-                if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
-                    HStack(spacing: 30) {
-                        RoundedButton(leadingImage: Image(systemName: "stop.fill"), title: "정지", action: {
-                            dismiss()
-                        })
-
+                VStack(alignment: .center) {
+                    Image(systemName: "list.bullet.circle")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.black)
+                        .onTapGesture {
+                            self.isToDoListHistoryView.toggle()
+                        }
+                        .padding(.bottom, 50)
+                    
+                    
+                    if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
+                        HStack(spacing: 30) {
+                            RoundedButton(leadingImage: Image(systemName: "stop.fill"), title: "정지", action: {
+                                dismiss()
+                            })
+                            
+                            RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
+                                setPomodoroStateChange()
+                            })
+                        }
+                        .padding(.bottom, 50)
+                    } else {
                         RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
                             setPomodoroStateChange()
                         })
+                        .padding(.bottom, 50)
                     }
-                    .padding(.bottom, 50)
-                } else {
-                    RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
-                        setPomodoroStateChange()
-                    })
-                    .padding(.bottom, 50)
                 }
             }
         }
@@ -387,6 +400,9 @@ struct PomodoroView: View {
                 setDateComponents(savedDate)
             }
         }
+        .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
+            ToDoDataResultListView(toDoListData: $toDoListData)
+        })
     }
     
     func getTimerChangeState() -> Bool {
