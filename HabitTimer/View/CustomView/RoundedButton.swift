@@ -14,7 +14,7 @@ struct RoundedButton: View {
     var fontSize: CGFloat = 18
     var fontName: String = "GmarketSansTTFMedium"
     var backgroundColor: Color = Color("1F2020")
-    var foregroundColor: Color = Color("B_1F2020")
+    var foregroundColor: Color = Color("1F2020_R")
     var height: CGFloat = 40
     var backgroundWidth: CGFloat = 120
     var cornerRadius: CGFloat = 10
