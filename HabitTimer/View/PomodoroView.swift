@@ -258,13 +258,11 @@ struct PomodoroView: View {
                     Image(systemName: "list.bullet.circle")
                         .resizable()
                         .frame(width: 40, height: 40)
-                        .foregroundColor(.black).opacity(getTimerChangeState() ? 0.3 : 1)
+                        .foregroundColor(.black).opacity(getTimerChangeState() ? 0 : 1)
                         .onTapGesture {
                             if getTimerChangeState() == false {
                                 self.isToDoListHistoryView.toggle()
-                            } else {
-                                toast = Toast(type: .info, title: "", message: "진행중에는 이력을 볼수 없습니다.", position: .top)
-                            }
+                            } 
                         }
                         .padding(.bottom, 50)
                     
