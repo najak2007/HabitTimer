@@ -24,20 +24,15 @@ class ToDoListViewModel: ObservableObject {
         fetchToDoList()
     }
     
-    func fetchToDoList(_ date: Date = Date()) {
+    func fetchToDoList(_ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
         
-#if __NOT_USE__
-        if date.yyyyMMdd == Date().yyyyMMdd {
-            toDoList = Array(results)
-            return
+        if isOnlyWeekDayShow == false {
+            toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
+        } else {
+            toDoList = Array(results).filter { $0.setWeekDays & Int(WeekDayValue.getWeekDayForDate(date)) != 0 }
         }
-        
-        toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
-#else
-        toDoList = Array(results).filter { $0.setWeekDays & Int(WeekDayValue.getWeekDayForDate(date)) != 0 }
-#endif
     }
     
     func fetchToDoListForWeekDay(_ toDoListData: ToDoListData, _ weekString: String) {
@@ -147,6 +142,26 @@ class ToDoListViewModel: ObservableObject {
         } catch {
             
         }
+    }
+    
+    func updateToMinuteTime(toDoListData: ToDoListData, updateMinute: Int, isBreakTime: Bool = false) -> ToDoListData {
+        guard let realm = realm else { return toDoListData }
+        let results = realm.objects(ToDoListData.self)
+        guard let updateToDoData = Array(results).filter({$0.id == toDoListData.id}).first else { return toDoListData }
+        
+        do {
+            try realm.write {
+                if isBreakTime == false {
+                    updateToDoData.selectedMinute = updateMinute
+                } else {
+                    updateToDoData.breakMinute = updateMinute
+                }
+                fetchToDoList()
+            }
+        } catch {
+            return toDoListData
+        }
+        return updateToDoData
     }
     
     func addCompletionToDoItem(toDoListData: ToDoListData, toDoListCompletion: ToDoListCompletion) {

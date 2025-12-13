@@ -15,6 +15,7 @@ struct InputToDoListView: View {
 
     var toDoListData: ToDoListData
     
+    @Binding var pomodoroState: PomodoroState
     @Binding var messageText: String
     
     var index: Int
@@ -23,11 +24,11 @@ struct InputToDoListView: View {
     var maxWidth: CGFloat = 280
     
     @FocusState private var isKeyboardFocused: Bool
-//    @State private var messageText: String = ""
     @State private var originalText: String = ""
     @State private var color: Color = .primary
     @State private var inputHeight: CGFloat = 40
     @State private var inputWidth: CGFloat = 0
+    @State private var isShow: Bool = true
  
     var textEditorHandler: (ToDoListData, String) -> Void
     var inputErrorHandler: (String) -> Void
@@ -37,11 +38,12 @@ struct InputToDoListView: View {
         VStack {
             TextField("작업할 일을 적어주세요.", text: $messageText, axis: .vertical)
                 .font(.custom("GmarketSansTTFMedium", size: fontSize))
-                .clearButton(text: $messageText)
+                .clearButton(text: $messageText, isShow: $isShow)
                 .lineLimit(1...maxLine)
                 .multilineTextAlignment(messageText.isEmpty ? .leading : .center)
                 .frame(maxWidth: maxWidth, idealHeight: 40, maxHeight: inputHeight/*Config.TODOLIST_ROW_HEIGHT - 40 */)
                 .lineSpacing(5)
+                .disabled(!isShow)
                 .focused($isKeyboardFocused)
                 .padding(.horizontal, 8)
                 .overlay(
@@ -63,6 +65,13 @@ struct InputToDoListView: View {
                         }
                     }
                 }
+                .onChange(of: pomodoroState) { oldValue, newValue in
+                    if newValue == .할일_진행중 || newValue == .휴식_진행중 {
+                        isShow = false
+                    } else {
+                        isShow = true
+                    }
+                }
                 .onAppear {
                     self.originalText = toDoListData.messageText
                     
@@ -72,30 +81,11 @@ struct InputToDoListView: View {
                         remaining = 0
                     }
                     color = Color("STICKER_\(remaining)")
+                    
+                    self.isShow = self.pomodoroState == .할일_진행중 || self.pomodoroState == .휴식_진행중 ? false : true
                 }
 
         }
-//        .toolbar {
-//            ToolbarItemGroup(placement: .keyboard) {
-//                Spacer()
-//                
-//                Button(action: {
-//                    
-//                    let trimWhiteSpace = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
-//                    
-//                    if trimWhiteSpace.isEmpty {
-//                        inputErrorHandler("1글자 이상 입력해주세요.")
-//                        return
-//                    } else {
-//                        textEditorHandler(toDoListData, trimWhiteSpace)
-//                    }
-//                    isKeyboardFocused = false
-//                }, label: {
-//                    Text("완료")
-//                })
-//                .opacity(self.isMessageTextChange ? 1 : 0)
-//            }
-//        }
     }
     
     func calculateTextWidth(text: String, font: UIFont) -> CGFloat {

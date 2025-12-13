@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import HapticsManager
 
 struct PostitListView: View {
     let postItName = [
@@ -35,7 +35,12 @@ struct PostitListView: View {
     @State private var messageTextEditorID: String = ""
     @State private var textWidth: CGFloat = 0
     @State private var date = Date()
+    @State private var isOnlyWeekDayShow: Bool = true
     @State private var backgroundDate: Date? = nil
+
+    @State private var backgroundDateText: String = ""
+
+    
     @StateObject private var timerManager = TimerManager()
     
     @Namespace private var animation
@@ -100,10 +105,11 @@ struct PostitListView: View {
                                         .padding(.horizontal, 8)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 16)
-                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
+                                                .stroke(Color.black.opacity(0.6), lineWidth: 0.8)
                                         )
 #endif
-                                    Image(systemName: "ellipsis.circle")
+                                   // Image(systemName: "ellipsis.circle")
+                                    Image(systemName: "list.bullet.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)
                                         .foregroundColor(.black)
@@ -140,6 +146,23 @@ struct PostitListView: View {
                             }
                         }
                         .id(toDoListViewModel.toDoList[index].id)
+                        .overlay {
+                            VStack {
+                                HStack {
+                                    Text(toDoListViewModel.toDoList[index].createDate.MMddDot)
+                                        .font(.custom("GmarketSansTTFBold", size: 15))
+                                        .foregroundColor(.black)
+                                        .padding(.vertical, 5)
+                                        .padding(.horizontal, 8)
+                                        .padding(.top, 25)
+                                        .padding(.leading, 48)
+                                        
+                                    Spacer()
+                                }
+                                
+                                Spacer()
+                            }
+                        }
                     }
                     .onDelete(perform: deleteItems)
                 }
@@ -163,16 +186,27 @@ struct PostitListView: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         if self.editMode == .inactive {
                             Button(action: {
-                                withAnimation(.easeIn(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
-                                    self.isAddToDoListShow.toggle()
+                                if date.yyyyMMdd == Date().yyyyMMdd {
+                                    withAnimation(.easeIn(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
+                                        self.isAddToDoListShow.toggle()
+                                    }
+                                } else {
+                                    setDateChange()
                                 }
                             }, label: {
-                                Image(systemName: "square.and.pencil")
-                                    .resizable()
-                                    .frame(width: 25, height: 25)
-                                    .foregroundColor(Color("1F2020"))
+                                if date.yyyyMMdd == Date().yyyyMMdd {
+                                    Image(systemName: "square.and.pencil")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                        .foregroundColor(Color("1F2020"))
+                                } else {
+                                    Text("오늘")
+                                        .font(.custom("GmarketSansTTFMedium", size: 15))
+                                        .foregroundColor(Color("1F2020"))
+                                }
                             })
                             .buttonStyle(PlainButtonStyle())
+                            
                         }
                     }
                     
@@ -182,7 +216,7 @@ struct PostitListView: View {
                                 .font(.custom("GmarketSansTTFBold", size: Config.MAIN_HEADER_TITLE_FONT_SIZE))
                                 .foregroundColor(.black)
                                 .onChange(of: date) { oldValue, newValue in
-                                    bind(oldValue != newValue)
+                                    bind()
                                 }
                             
                             Image(systemName: "arrowtriangle.down.circle")
@@ -223,7 +257,7 @@ struct PostitListView: View {
                 .scrollContentBackground(.hidden)
                 .background(.white)
                 .contentMargins(.horizontal, 0)
-                .padding(.top, -34)
+//                .padding(.top, -34)
                 .overlay {
                     VStack(alignment: .center) {
                         Spacer()
@@ -236,6 +270,35 @@ struct PostitListView: View {
                     }
                     .opacity(self.toDoListViewModel.toDoList.isEmpty ? 1 : 0)
                 }
+                .overlay {
+                    VStack {
+                        HStack(spacing: 5) {
+                            Spacer()
+                            
+                            Text("요일별")
+                                .font(.custom("GmarketSansTTFMedium", size: 16))
+                        
+                            Toggle(isOn: $isOnlyWeekDayShow) {
+
+                            }
+                            .labelsHidden()
+                            .controlSize(ControlSize.mini)
+                            .onChange(of: isOnlyWeekDayShow) { oldValue, newValue in
+                                bind()
+                            }
+                            .hapticFeedback(.impact(.medium), trigger: isOnlyWeekDayShow)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.top, -34)
+                        
+                        Spacer()
+#if DEBUG
+                        Text("backgroundDateText = \(backgroundDateText) self.date = \(self.date.yyMMddDot )")
+#endif
+                    }
+                }
+                
+                
                 .overlay {
                     VStack(spacing: 10) {
                         Spacer()
@@ -312,6 +375,11 @@ struct PostitListView: View {
             if oldValue == .inactive, newValue == .background {
                 timerManager.midnightResetTimer()
                 self.backgroundDate = Date()
+                
+                self.backgroundDateText = self.backgroundDate?.yyMMddDot ?? ""
+#if DEBUG_USE
+                self.backgroundDate = CalendarViewModel().subtractDaysFromDate(days: 1, from: Date())
+#endif
             } else if oldValue == .background, newValue == .inactive {
                 if backgroundDate != nil {
                     if backgroundDate?.yyyyMMdd != Date().yyyyMMdd {
@@ -354,7 +422,7 @@ struct PostitListView: View {
     }
     
     func bind(_ isLoading: Bool = false) {
-        toDoListViewModel.fetchToDoList(date)
+        toDoListViewModel.fetchToDoList(date, isOnlyWeekDayShow)
     }
 }
 

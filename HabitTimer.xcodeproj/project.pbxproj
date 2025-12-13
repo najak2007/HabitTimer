@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		891129602EE8166B00BEF5E6 /* HapticsManager in Frameworks */ = {isa = PBXBuildFile; productRef = 8911295F2EE8166B00BEF5E6 /* HapticsManager */; };
 		8919FA3F2EC2EF6600272030 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8919FA3E2EC2EF6600272030 /* RealmSwift */; };
 		8919FA402EC2EF7000272030 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 8919FA3E2EC2EF6600272030 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -56,6 +57,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8919FA3F2EC2EF6600272030 /* RealmSwift in Frameworks */,
+				891129602EE8166B00BEF5E6 /* HapticsManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +102,7 @@
 			name = HabitTimer;
 			packageProductDependencies = (
 				8919FA3E2EC2EF6600272030 /* RealmSwift */,
+				8911295F2EE8166B00BEF5E6 /* HapticsManager */,
 			);
 			productName = HabitTimer;
 			productReference = 7A9FC3E62EBA1AE90000E9E2 /* HabitTimer.app */;
@@ -131,6 +134,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8919FA3D2EC2EF6600272030 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				8911295E2EE8166B00BEF5E6 /* XCRemoteSwiftPackageReference "HapticsManager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7A9FC3E72EBA1AE90000E9E2 /* Products */;
@@ -293,12 +297,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = HabitTimer/HabitTimer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GFSSMD5582;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GFSSMD5582;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HabitTimer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WeekTime;
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -314,6 +321,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = co.kr.oceanbleu.HabitTimer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "습관타이머_20251104";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -335,12 +343,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = HabitTimer/HabitTimer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GFSSMD5582;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GFSSMD5582;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HabitTimer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WeekTime;
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -356,6 +367,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = co.kr.oceanbleu.HabitTimer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "습관타이머_20251104";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -394,6 +406,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8911295E2EE8166B00BEF5E6 /* XCRemoteSwiftPackageReference "HapticsManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/markbattistella/HapticsManager.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 25.11.26;
+			};
+		};
 		8919FA3D2EC2EF6600272030 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-swift.git";
@@ -405,6 +425,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8911295F2EE8166B00BEF5E6 /* HapticsManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8911295E2EE8166B00BEF5E6 /* XCRemoteSwiftPackageReference "HapticsManager" */;
+			productName = HapticsManager;
+		};
 		8919FA3E2EC2EF6600272030 /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8919FA3D2EC2EF6600272030 /* XCRemoteSwiftPackageReference "realm-swift" */;
