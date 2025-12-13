@@ -125,7 +125,7 @@ struct PomodoroView: View {
                                     minuteValue = newValue
                                     
                                     updateToDoListMinute(isBreakState: pomodoroState == .초기화 || pomodoroState == .휴식_완료 ? false : true)
-                                    if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 {
+                                    if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 || pomodoroState == .휴식_건너뛰기 {
                                         return
                                     }
                                     
@@ -222,7 +222,7 @@ struct PomodoroView: View {
                                     minuteValue = newValue
                                     
                                     updateToDoListMinute(isBreakState: pomodoroState == .초기화 || pomodoroState == .휴식_완료 ? false : true)
-                                    if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 {
+                                    if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 || pomodoroState == .휴식_건너뛰기 {
                                         return
                                     }
                                     
@@ -271,6 +271,17 @@ struct PomodoroView: View {
                         HStack(spacing: 30) {
                             RoundedButton(leadingImage: Image(systemName: "stop.fill"), title: "정지", action: {
                                 dismiss()
+                            })
+                            
+                            RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
+                                setPomodoroStateChange()
+                            })
+                        }
+                        .padding(.bottom, 50)
+                    } else if pomodoroState == .할일_완료 {
+                        HStack(spacing: 30) {
+                            RoundedButton(leadingImage: Image(systemName: "arrowshape.turn.up.right.fill"), title: "건너 뛰기", action: {
+                                setPomodoroBreakTimeSkip()
                             })
                             
                             RoundedButton(leadingImage: getPomodoroStateImageDisplay(), title: getPomodoroStateDisplay(), action: {
@@ -483,6 +494,16 @@ struct PomodoroView: View {
         }
     }
     
+    func getToDoPlayingForText() -> Color {
+        var remaining = index % Config.MAIN_STICKER_COUNT
+        
+        if remaining >= Config.MAIN_STICKER_COUNT {
+            remaining = 0
+        }
+        
+        return Color("STICKER_\(remaining)")
+    }
+    
     func setStartAction() {
         getSecondTimeToMinuteTime()
         getTimerForAngle()
@@ -510,7 +531,7 @@ struct PomodoroView: View {
                     self.setStartAction()
                     if self.isFullScreen == false {
                         DispatchQueue.main.async {
-                            color = Color(hex: "0xE3EAA7")
+                            color = pomodoroState == .할일_완료 ? Color(hex: "0xE3EAA7") : getToDoPlayingForText()
                             self.endPercent = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(selectedMinute) * Config.POMODORO_TIME_MINUTE))
                         }
                     }
@@ -549,6 +570,8 @@ struct PomodoroView: View {
             return Image(systemName: "pause.fill")
         case .할일_일시정지, .휴식_일시정지:
             return Image(systemName: "playpause.fill")
+        default:
+            return nil
         }
     }
     
@@ -564,16 +587,27 @@ struct PomodoroView: View {
             stateString = "휴식 시작하기"
         case .할일_일시정지, .휴식_일시정지:
             stateString = "계속"
+        default:
+            stateString = ""
         }
         
         return stateString
+    }
+    
+    func setPomodoroBreakTimeSkip() {
+        pomodoroState = .휴식_건너뛰기
+        
+        self.selectedMinute = toDoListData.selectedMinute
+        self.minuteValue = toDoListData.selectedMinute
+        
+        setPomodoroStateChange()
     }
     
     func setPomodoroStateChange() {
         let currentPomodoroState: PomodoroState = pomodoroState
         var isResume: Bool = false
         
-        if currentPomodoroState == .초기화 || currentPomodoroState == .휴식_완료 {
+        if currentPomodoroState == .초기화 || currentPomodoroState == .휴식_완료 || currentPomodoroState == .휴식_건너뛰기 {
             pomodoroState = .할일_진행중
         } else if currentPomodoroState == .할일_진행중 {
             pomodoroState = .할일_일시정지
@@ -590,6 +624,10 @@ struct PomodoroView: View {
         }
         
         if pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중 {
+            if pomodoroState == .할일_진행중 {
+                setToDoPlayingForColor()
+            }
+
             if isResume == false {
                 timerManager.startTimer()
             } else {

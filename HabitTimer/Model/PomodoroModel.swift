@@ -25,6 +25,7 @@ enum PomodoroState: Int, Decodable, Encodable {
     case 휴식_진행중
     case 휴식_일시정지
     case 휴식_완료
+    case 휴식_건너뛰기
 }
 
 enum WeekDayExpireDate: String {
