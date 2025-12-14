@@ -108,7 +108,8 @@ struct PostitListView: View {
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 0.8)
                                         )
 #endif
-                                    Image(systemName: "ellipsis.circle")
+                                   // Image(systemName: "ellipsis.circle")
+                                    Image(systemName: "list.bullet.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)
                                         .foregroundColor(.black)
