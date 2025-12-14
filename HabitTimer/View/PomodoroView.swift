@@ -360,6 +360,7 @@ struct PomodoroView: View {
             secondTimer.upstream.connect().cancel()
             timerManager.resetTimer()
             NotificationManager.instance.cancelNotification()
+            TimeLiveActivityManager.shared.offLiveActivity()
         }
         .onTapGesture {
             self.endTextEditing()
@@ -645,6 +646,7 @@ struct PomodoroView: View {
         } else if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
             timerManager.pauseTimer()
             NotificationManager.instance.cancelNotification()
+            TimeLiveActivityManager.shared.offLiveActivity()
         }
     }
     
