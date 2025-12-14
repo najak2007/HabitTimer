@@ -627,13 +627,19 @@ struct PomodoroView: View {
             if pomodoroState == .할일_진행중 {
                 setToDoPlayingForColor()
             }
-
+#if DEBUG
+            print("TimerManager timeRemaining = \(self.timeRemaining)")
+#endif
             if isResume == false {
                 timerManager.startTimer()
+                TimeLiveActivityManager.shared.onLiveActivity(activityTitle: toDoListData.messageText, backgroundIndex: self.index, activityStatus: pomodoroState, remaingTime: Int(self.timeRemaining))
+                
             } else {
                 timerManager.resumeTimer()
+                TimeLiveActivityManager.shared.offLiveActivity()
             }
             
+            NotificationManager.instance.timeInterval = self.timeRemaining
             NotificationManager.instance.scheduleNotification(title: pomodoroState == .할일_진행중 ? "집중 시간" : "휴식 시간", body: toDoListData.messageText, timeInterval: self.timeRemaining, triggerType: .time)
             
         } else if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
@@ -663,6 +669,10 @@ struct PomodoroView: View {
             } else {
                 timerDisplay = String(format: "%02d:%02d", minuteValue, secondValue)
             }
+        }
+        
+        if pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중 || pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
+            TimeLiveActivityManager.shared.updateLiveActivity(remaingTime: Int(self.timeRemaining))
         }
     }
 }

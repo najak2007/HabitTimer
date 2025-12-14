@@ -11,7 +11,7 @@ import CoreLocation
 
 class NotificationManager: NSObject {
     static let instance = NotificationManager()
-    var timeInterval: Double = 10
+    var timeInterval: Double = 0
     private override init() {}
     
     func requestAuthorization() {
@@ -58,6 +58,10 @@ class NotificationManager: NSObject {
     }
     
     func scheduleNotification(title: String, body: String, timeInterval: Double, triggerType: TriggerType) {
+        if timeInterval == 0 {
+            return
+        }
+        
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body

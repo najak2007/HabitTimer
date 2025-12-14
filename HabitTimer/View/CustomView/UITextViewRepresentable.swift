@@ -19,6 +19,7 @@ struct UITextViewRepresentable: UIViewRepresentable {
         let textView = UITextView(frame: .zero)
         textView.delegate = context.coordinator
         textView.font = UIFont(name: "GmarketSansTTFMedium", size: 18)
+        textView.textColor = UIColor.black
         textView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         textView.layer.borderWidth = 1.0
         textView.layer.borderColor = UIColor.darkGray.cgColor
@@ -73,7 +74,7 @@ struct UITextViewRepresentable: UIViewRepresentable {
         
         func textViewDidBeginEditing(_ textView: UITextView) {
             self.isFocused = true
-            textView.layer.borderColor = UIColor(named: "1F2020")?.cgColor
+            textView.layer.borderColor = UIColor.black.cgColor
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
