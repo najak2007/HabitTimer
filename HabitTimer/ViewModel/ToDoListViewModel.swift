@@ -105,12 +105,12 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
-    func deleteToDoList(_ toDoListData: ToDoListData) {
+    func deleteToDoList(_ toDoListData: ToDoListData, _ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true) {
         guard let realm = realm else { return }
         do {
             try realm.write {
                 realm.delete(toDoListData)
-                fetchToDoList()
+                fetchToDoList(date, isOnlyWeekDayShow)
             }
         } catch {
             
@@ -205,5 +205,11 @@ class ToDoListViewModel: ObservableObject {
         }
         
         return weekDayStringArr.joined(separator: ",")
+    }
+    
+    func subtractSecondsFromDate(seconds: Int, from date: Date) -> Date {
+        guard let changeDate = Calendar.current.date(byAdding: .second, value: seconds, to: date) else { return Date() }
+
+        return changeDate
     }
 }

@@ -11,12 +11,13 @@ import ActivityKit
 @objc class TimeLiveActivityManager: NSObject {
     private var activity: Activity<TimeWidgetAttributes>?
     @objc static let shared = TimeLiveActivityManager()
+
     
     private init(activity: Activity<TimeWidgetAttributes>? = nil) {
         self.activity = activity
     }
     
-    func onLiveActivity(activityTitle: String, backgroundIndex: Int, activityStatus: PomodoroState, remaingTime: Int) {
+    func onLiveActivity(activityTitle: String, backgroundIndex: Int, activityStatus: PomodoroState, remaingTime: Int, staleDate: Date? = nil) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         
         let attributes = TimeWidgetAttributes(
@@ -24,25 +25,33 @@ import ActivityKit
             backgroundIndex: backgroundIndex,
             pomodoroState: activityStatus,
         )
+        
         let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
+        let content = ActivityContent(state: state, staleDate: staleDate, relevanceScore: 1.0)
         
         do {
-            self.activity = try Activity.request(attributes: attributes, contentState: state)
+            self.activity = try Activity.request(attributes: attributes, content: content)
         } catch {
             
         }
     }
     
-    @objc func offLiveActivity() {
+    @objc func offLiveActivity(staleDate: Date? = nil) {
         Task {
-            await activity?.end(using: nil, dismissalPolicy: .immediate)
+            await activity?.end(nil, dismissalPolicy: .immediate)
         }
     }
     
-    func updateLiveActivity(remaingTime: Int) {
+    func updateLiveActivity(remaingTime: Int, staleDate: Date? = nil) {
+        let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
+        let newContent = ActivityContent(state: state, staleDate: staleDate, relevanceScore: 1.0)
+
         Task {
-            let newState = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
-            await self.activity?.update(using: newState)
+            if remaingTime > 0 {
+                await self.activity?.update(newContent)
+            } else {
+                self.offLiveActivity()
+            }
         }
     }
 }

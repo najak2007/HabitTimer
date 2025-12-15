@@ -26,7 +26,7 @@ struct TimeWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TimeWidgetAttributes.self) { context in
             // Lock screen/banner UI goes here
-            VStack {
+            VStack(spacing: 10) {
                 Text(context.attributes.title)
                     .font(.custom("GmarketSansTTFMedium", size: Config.LIVE_ACTIVITY_TITLE_FONT_SIZE))
                     .foregroundColor(.black)
@@ -68,7 +68,6 @@ struct TimeWidgetLiveActivity: Widget {
             } minimal: {
                 Text(activityTimeConfiguration(for: context.state.remaingTime))
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
             .keylineTint(Color.red)
         }
     }

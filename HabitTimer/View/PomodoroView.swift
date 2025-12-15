@@ -412,6 +412,7 @@ struct PomodoroView: View {
                     return
                 }
                 setDateComponents(savedDate)
+                UserDefaults.standard.removeObject(forKey: Config.TIMEREMAING_SAVE_ID)
             }
         }
         .fullScreenCover(isPresented: $isToDoListHistoryView, content: {
@@ -450,6 +451,9 @@ struct PomodoroView: View {
                 self.minuteValue = 0
                 timerManager.timeRemaining = 0
                 timerManager.resetTimer()
+                
+                nextToDoListConfiguration()
+                
             }
             getSecondTimeToMinuteTime()
         }
@@ -527,15 +531,7 @@ struct PomodoroView: View {
                     }
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.selectedMinute = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
-                    self.minuteValue = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
-                    self.setStartAction()
-                    if self.isFullScreen == false {
-                        DispatchQueue.main.async {
-                            color = pomodoroState == .할일_완료 ? Color(hex: "0xE3EAA7") : getToDoPlayingForText()
-                            self.endPercent = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(selectedMinute) * Config.POMODORO_TIME_MINUTE))
-                        }
-                    }
+                    nextToDoListConfiguration()
                 }
             }
             return
@@ -545,6 +541,20 @@ struct PomodoroView: View {
         
         withAnimation(.easeInOut(duration: 0.2)) {
             self.endPercent = startAngle
+        }
+    }
+    
+    func nextToDoListConfiguration() {
+        if pomodoroState == .할일_완료 || pomodoroState == .휴식_완료 {
+            self.selectedMinute = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
+            self.minuteValue = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
+            self.setStartAction()
+            if self.isFullScreen == false {
+                DispatchQueue.main.async {
+                    color = pomodoroState == .할일_완료 ? Color(hex: "0xE3EAA7") : getToDoPlayingForText()
+                    self.endPercent = 360 / (Config.POMODORO_TIME_FULL_COUNT / (Double(selectedMinute) * Config.POMODORO_TIME_MINUTE))
+                }
+            }
         }
     }
 
@@ -633,7 +643,7 @@ struct PomodoroView: View {
 #endif
             if isResume == false {
                 timerManager.startTimer()
-                TimeLiveActivityManager.shared.onLiveActivity(activityTitle: toDoListData.messageText, backgroundIndex: self.index, activityStatus: pomodoroState, remaingTime: Int(self.timeRemaining))
+                TimeLiveActivityManager.shared.onLiveActivity(activityTitle: toDoListData.messageText, backgroundIndex: self.index, activityStatus: pomodoroState, remaingTime: Int(self.timeRemaining), staleDate: toDoListViewModel.subtractSecondsFromDate(seconds: Int(self.timeRemaining), from: Date()))
                 
             } else {
                 timerManager.resumeTimer()

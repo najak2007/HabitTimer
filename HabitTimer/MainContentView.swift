@@ -108,7 +108,6 @@ struct PostitListView: View {
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 0.8)
                                         )
 #endif
-                                   // Image(systemName: "ellipsis.circle")
                                     Image(systemName: "list.bullet.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)
@@ -218,12 +217,14 @@ struct PostitListView: View {
                                 .onChange(of: date) { oldValue, newValue in
                                     bind()
                                 }
+
                             
                             Image(systemName: "arrowtriangle.down.circle")
                                 .resizable()
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(.black)
                         }
+
                         .overlay {
                             DatePicker(selection: $date, displayedComponents: [.date]) {
                                 
@@ -418,7 +419,7 @@ struct PostitListView: View {
         guard deleteIndex < toDoListViewModel.toDoList.count else { return }
         
         self.isDeleteAction = true
-        toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex])
+        toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex], date, isOnlyWeekDayShow)
     }
     
     func bind(_ isLoading: Bool = false) {

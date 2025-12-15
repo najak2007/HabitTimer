@@ -101,6 +101,8 @@ final class CalendarViewModel: ObservableObject {
         return changeDate
     }
     
+
+    
     func expandExtractDate(currentMonth: Date, currentWeekday: Int, isPreviousDay: Bool = true) -> [DateValue] {
         let calendar = Calendar.current
         let days: [DateValue] = currentMonth.getAllDates().compactMap { date -> DateValue in
