@@ -109,12 +109,42 @@ class ToDoListViewModel: ObservableObject {
         guard let realm = realm else { return }
         do {
             try realm.write {
-                toDoListData.isDeleteRequest = isDeleteRequest
-                realm.delete(toDoListData)
+                if isDeleteRequest == false {
+                    realm.delete(toDoListData)
+                } else {
+                    toDoListData.isDeleteRequest = isDeleteRequest
+                }
                 fetchToDoList(date, isOnlyWeekDayShow)
             }
         } catch {
             
+        }
+    }
+    
+    func deleteToDoListUndo(_ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true, _ completionHandle: @escaping((Bool) -> Void)) {
+        guard let realm = realm else { return }
+        
+        let toDoListData = realm.objects(ToDoListData.self).filter("isDeleteRequest == true")
+        
+        do {
+            try realm.write {
+                var undoCount: Int = 0
+                
+                for toDoList in toDoListData {
+                    toDoList.isDeleteRequest = false
+                    undoCount += 1
+                }
+                
+                if undoCount == 0 {
+                    completionHandle(false)
+                } else {
+                    completionHandle(true)
+                }
+                
+                fetchToDoList(date, isOnlyWeekDayShow)
+            }
+        } catch {
+            completionHandle(false)
         }
     }
     

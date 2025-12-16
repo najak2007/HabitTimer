@@ -411,6 +411,17 @@ struct PostitListView: View {
                 
             }
         }
+        .onChange(of: isDeleteAlertShow) { oldValue, newValue in
+            if oldValue, newValue == false {
+#if DEBUG
+                toDoListViewModel.deleteToDoListUndo(date, isOnlyWeekDayShow) { isUndo in
+                    if isUndo {
+                        toast = Toast(type: .info, title: "", message: "삭제가 취소 되었습니다.", position: .top)
+                    }
+                }
+#endif
+            }
+        }
 
         .ignoresSafeArea()
     }
