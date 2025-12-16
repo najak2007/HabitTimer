@@ -43,13 +43,14 @@ struct PomodoroView: View {
     @State private var weekDays: Int = 0
     @State private var weekDaysList: [WeekDayItem] = []
     @State private var isToDoListHistoryView: Bool = false
+    @State private var messageText: String = ""
+    @State private var showing = false
     
     var toDoListViewModel: ToDoListViewModel
     @Binding var toDoListData: ToDoListData
-    @State private var messageText: String = ""
+    @Binding var selectedDate: Date
+    @Binding var isOnlyWeekDayShow: Bool
     var index: Int = 0
-    
-    @State private var showing = false
     
     var body: some View {
         NavigationView {
@@ -83,7 +84,7 @@ struct PomodoroView: View {
                         }
                         
                         if self.isDoneButtonShow {
-                            toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, messageText: messageText)
+                            toDoListViewModel.updateToDoMessageText(toDoListData: toDoListData, date: selectedDate, isOnlyWeekDayShow: isOnlyWeekDayShow, messageText: messageText)
                             toast = Toast(type: .info, title: "", message: "저장되었습니다.", position: .top)
                             self.isDoneButtonShow.toggle()
                         } else {
@@ -379,7 +380,7 @@ struct PomodoroView: View {
                         }
                     }
                     .onChange(of: weekDays) { oldValue, newValue in
-                        toDoListViewModel.updateToWeekDays(toDoListData: toDoListData, updateWeekDay: newValue)
+                        toDoListViewModel.updateToWeekDays(toDoListData: toDoListData, date: selectedDate, isOnlyWeekDayShow: isOnlyWeekDayShow,  updateWeekDay: newValue)
                     }
                 }
             }
@@ -426,7 +427,7 @@ struct PomodoroView: View {
     }
     
     func updateToDoListMinute(isBreakState: Bool = false) {
-        toDoListData = toDoListViewModel.updateToMinuteTime(toDoListData: toDoListData, updateMinute: self.minuteValue, isBreakTime: isBreakState)
+        toDoListData = toDoListViewModel.updateToMinuteTime(toDoListData: toDoListData, date: selectedDate, isOnlyWeekDayShow: isOnlyWeekDayShow, updateMinute: self.minuteValue, isBreakTime: isBreakState)
     }
     
     func setDateComponents(_ savedDate: Date) {
@@ -570,7 +571,7 @@ struct PomodoroView: View {
             breakMinute: pomodoroState == .할일_진행중 ? 0 : self.selectedMinute
         )
             
-        toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, toDoListCompletion: toDoListCompletion)
+        toDoListViewModel.addCompletionToDoItem(toDoListData: toDoListData, date: selectedDate, isOnlyWeekDayShow: isOnlyWeekDayShow,  toDoListCompletion: toDoListCompletion)
     }
     
     func getPomodoroStateImageDisplay() -> Image? {

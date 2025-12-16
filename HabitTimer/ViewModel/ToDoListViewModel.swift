@@ -93,12 +93,12 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
-    func addToDoList(_ toDoListData: ToDoListData) {
+    func addToDoList(_ toDoListData: ToDoListData, _ isOnlyWeekDayShow: Bool = true) {
         guard let realm = realm else { return }
         do {
             try realm.write {
                 realm.add(toDoListData)
-                fetchToDoList()
+                fetchToDoList(toDoListData.createDate, isOnlyWeekDayShow)
             }
         } catch {
             
@@ -117,13 +117,13 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
-    func updateToDoMessageText(toDoListData: ToDoListData, messageText: String) {
+    func updateToDoMessageText(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, messageText: String) {
         guard let realm = realm else { return }
         
         do {
             try realm.write {
                 toDoListData.messageText = messageText
-                fetchToDoList()
+                fetchToDoList(date, isOnlyWeekDayShow)
             }
             
         } catch {
@@ -131,20 +131,20 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
-    func updateToWeekDays(toDoListData: ToDoListData, updateWeekDay: Int) {
+    func updateToWeekDays(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, updateWeekDay: Int) {
         guard let realm = realm else { return }
         
         do {
             try realm.write {
                 toDoListData.setWeekDays = updateWeekDay
-                fetchToDoList()
+                fetchToDoList(date, isOnlyWeekDayShow)
             }
         } catch {
             
         }
     }
     
-    func updateToMinuteTime(toDoListData: ToDoListData, updateMinute: Int, isBreakTime: Bool = false) -> ToDoListData {
+    func updateToMinuteTime(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, updateMinute: Int, isBreakTime: Bool = false) -> ToDoListData {
         guard let realm = realm else { return toDoListData }
         let results = realm.objects(ToDoListData.self)
         guard let updateToDoData = Array(results).filter({$0.id == toDoListData.id}).first else { return toDoListData }
@@ -156,7 +156,7 @@ class ToDoListViewModel: ObservableObject {
                 } else {
                     updateToDoData.breakMinute = updateMinute
                 }
-                fetchToDoList()
+                fetchToDoList(date, isOnlyWeekDayShow)
             }
         } catch {
             return toDoListData
@@ -164,7 +164,7 @@ class ToDoListViewModel: ObservableObject {
         return updateToDoData
     }
     
-    func addCompletionToDoItem(toDoListData: ToDoListData, toDoListCompletion: ToDoListCompletion) {
+    func addCompletionToDoItem(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, toDoListCompletion: ToDoListCompletion) {
         guard let realm = realm else { return }
         let results = realm.objects(ToDoListData.self)
         guard let updateToDoData = Array(results).filter({$0.id == toDoListData.id}).first else { return }
@@ -172,7 +172,7 @@ class ToDoListViewModel: ObservableObject {
         do {
             try realm.write {
                 updateToDoData.toDoListItems.append(toDoListCompletion)
-                fetchToDoList()
+                fetchToDoList(date, isOnlyWeekDayShow)
             }
         }catch {
         }

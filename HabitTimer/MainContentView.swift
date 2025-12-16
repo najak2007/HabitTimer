@@ -258,7 +258,6 @@ struct PostitListView: View {
                 .scrollContentBackground(.hidden)
                 .background(.white)
                 .contentMargins(.horizontal, 0)
-//                .padding(.top, -34)
                 .overlay {
                     VStack(alignment: .center) {
                         Spacer()
@@ -322,7 +321,7 @@ struct PostitListView: View {
                                 
                                 let newToDoData = ToDoListData()
                                 newToDoData.setMessageText(messageText: trimString)
-                                toDoListViewModel.addToDoList(newToDoData)
+                                toDoListViewModel.addToDoList(newToDoData, isOnlyWeekDayShow)
                                 messageText = ""
                                 withAnimation(.easeOut(duration: Config.TEXTVIEW_SHOW_ANIMATION_INTERVAL)) {
                                     self.isAddToDoListShow.toggle()
@@ -354,9 +353,13 @@ struct PostitListView: View {
                 UIApplication.shared.endEditing()
             }
         }
-        .fullScreenCover(isPresented: $isPomodoroShow, content: {
-            PomodoroView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData, index: toDoListViewModel.selectedIndex)
+
+        .fullScreenCover(isPresented: $isPomodoroShow, onDismiss: {
+            
+        }, content: {
+            PomodoroView(toDoListViewModel: toDoListViewModel, toDoListData: $toDoListViewModel.selectedToDoListData, selectedDate: $date, isOnlyWeekDayShow: $isOnlyWeekDayShow, index: toDoListViewModel.selectedIndex)
         })
+        
         .transaction { transaction in
             transaction.disablesAnimations = true
             

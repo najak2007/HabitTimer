@@ -15,11 +15,12 @@ struct PomodoroSettingView: View {
     @State private var focusTimeIndex: Int = 0
     @State private var breakTimeIndex: Int = 0
     
+    
     @Binding var isAlarmStatus: Bool
     @Binding var isFullScreen: Bool
     @Binding var weekDays: Int
     @Binding var weekDaysList: [WeekDayItem]
-    
+
     @State private var toast: Toast? = nil
     
     var body: some View {
@@ -147,7 +148,6 @@ struct PomodoroSettingView: View {
             }
             
             Section(header: PomodoroListHeaderView(headerText: "뽀모도로 설정", showAlignments: .좌측정렬)) {
-                
                 Button(action: {
                     
                 }, label: {
