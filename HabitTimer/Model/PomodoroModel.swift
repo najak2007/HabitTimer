@@ -61,6 +61,7 @@ final class ToDoListData: Object, Comparable {
     @objc dynamic var breakMinute: Int = Config.POMODORO_BREAK_TIME_MINUTE
     dynamic var toDoListItems: List<ToDoListCompletion> = List<ToDoListCompletion>()
     @objc dynamic var setWeekDays: Int = 0x000
+    @objc dynamic var isDeleteRequest: Bool = false
 #endif
     static func < (lhs: ToDoListData, rhs: ToDoListData) -> Bool {
         return lhs.createDate < rhs.createDate

@@ -29,9 +29,9 @@ class ToDoListViewModel: ObservableObject {
         let results = realm.objects(ToDoListData.self)
         
         if isOnlyWeekDayShow == false {
-            toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd }
+            toDoList = Array(results).filter { $0.createDate.yyyyMMdd == date.yyyyMMdd  && $0.isDeleteRequest == false}
         } else {
-            toDoList = Array(results).filter { $0.setWeekDays & Int(WeekDayValue.getWeekDayForDate(date)) != 0 }
+            toDoList = Array(results).filter { $0.setWeekDays & Int(WeekDayValue.getWeekDayForDate(date)) != 0 && $0.isDeleteRequest == false }
         }
     }
     
@@ -105,10 +105,11 @@ class ToDoListViewModel: ObservableObject {
         }
     }
     
-    func deleteToDoList(_ toDoListData: ToDoListData, _ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true) {
+    func deleteToDoList(_ toDoListData: ToDoListData, _ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true, _ isDeleteRequest: Bool = true) {
         guard let realm = realm else { return }
         do {
             try realm.write {
+                toDoListData.isDeleteRequest = isDeleteRequest
                 realm.delete(toDoListData)
                 fetchToDoList(date, isOnlyWeekDayShow)
             }

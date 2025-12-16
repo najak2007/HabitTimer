@@ -37,6 +37,7 @@ struct PostitListView: View {
     @State private var date = Date()
     @State private var isOnlyWeekDayShow: Bool = true
     @State private var backgroundDate: Date? = nil
+    @State private var isDeleteAlertShow: Bool = false
 
     @State private var backgroundDateText: String = ""
 
@@ -340,7 +341,9 @@ struct PostitListView: View {
                     }
                     .opacity(self.isAddToDoListShow == true ? 1 : 0)
                 }
+
             }
+
         }
         .onChange(of: self.isAddToDoListShow) { oldValue, newValue in
             if oldValue, newValue == false {
@@ -395,9 +398,23 @@ struct PostitListView: View {
             }
         }
         .toastView(toast: $toast)
+        .confirmationDialog("삭제 범위를 선택하세요.", isPresented: $isDeleteAlertShow, titleVisibility: .visible) {
+            Button("\"\(date.weekDay)\" 요일 에서만 삭제") {
+                
+            }
+            
+            Button("모두 삭제", role: .destructive) {
+                
+            }
+            
+            Button("취소", role: .cancel) {
+                
+            }
+        }
 
         .ignoresSafeArea()
     }
+    
     
     private func setDateChange() {
         self.date = Date()
@@ -422,6 +439,8 @@ struct PostitListView: View {
         guard deleteIndex < toDoListViewModel.toDoList.count else { return }
         
         self.isDeleteAction = true
+        self.isDeleteAlertShow.toggle()
+        
         toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex], date, isOnlyWeekDayShow)
     }
     
