@@ -43,9 +43,10 @@ import ActivityKit
     }
     
     func updateLiveActivity(remaingTime: Int, staleDate: Date? = nil) {
+
         let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
         let newContent = ActivityContent(state: state, staleDate: staleDate, relevanceScore: 1.0)
-
+#if __NOT_USE__
         Task {
             if remaingTime > 0 {
                 await self.activity?.update(newContent)
@@ -53,5 +54,9 @@ import ActivityKit
                 self.offLiveActivity()
             }
         }
+#else
+        
+        
+#endif
     }
 }
