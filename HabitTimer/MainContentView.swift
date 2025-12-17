@@ -293,9 +293,6 @@ struct PostitListView: View {
                         .padding(.top, -34)
                         
                         Spacer()
-#if DEBUG
-                        Text("backgroundDateText = \(backgroundDateText) self.date = \(self.date.yyMMddDot )")
-#endif
                     }
                 }
                 
@@ -371,7 +368,9 @@ struct PostitListView: View {
             ToDoDataResultListView(toDoListData: $toDoListViewModel.selectedToDoListData)
         })
         .onAppear {
-            timerManager.midnightCheckTimer()
+            toDoListViewModel.deleteToDoListUndo(date, isOnlyWeekDayShow) { _ in
+                timerManager.midnightCheckTimer()
+            }
         }
         .onReceive(midnightPassed) {
             setDateChange()
@@ -388,6 +387,10 @@ struct PostitListView: View {
                 self.backgroundDate = CalendarViewModel().subtractDaysFromDate(days: 1, from: Date())
 #endif
             } else if oldValue == .background, newValue == .inactive {
+#if DEBUG
+                toast = Toast(type: .info, title: "백그라운드 = \(backgroundDate?.yyyyMMdd ?? "")", message: "지금 = \(Date().yyyyMMdd), 선택된 날짜 = \(date.yyyyMMdd)", position: .top)
+#endif
+
                 if backgroundDate != nil {
                     if backgroundDate?.yyyyMMdd != Date().yyyyMMdd {
                         setDateChange()
@@ -400,26 +403,28 @@ struct PostitListView: View {
         .toastView(toast: $toast)
         .confirmationDialog("삭제 범위를 선택하세요.", isPresented: $isDeleteAlertShow, titleVisibility: .visible) {
             Button("\"\(date.weekDay)\" 요일 에서만 삭제") {
-                
+                guard let toDoDataID = toDoListViewModel.deleteToDoListID else { return }
+                toDoListViewModel.deleteToWeekDays(toDoListDataID: toDoDataID, date: date, isOnlyWeekDayShow: isOnlyWeekDayShow)
             }
             
             Button("모두 삭제", role: .destructive) {
-                
+                guard let toDoDataID = toDoListViewModel.deleteToDoListID else { return }
+                toDoListViewModel.deleteToDoListData(toDoListDataID: toDoDataID, date: date, isOnlyWeekDayShow: isOnlyWeekDayShow)
             }
             
-            Button("취소", role: .cancel) {
+            Button("취소") {
                 
             }
         }
         .onChange(of: isDeleteAlertShow) { oldValue, newValue in
             if oldValue, newValue == false {
-#if DEBUG
+
                 toDoListViewModel.deleteToDoListUndo(date, isOnlyWeekDayShow) { isUndo in
                     if isUndo {
                         toast = Toast(type: .info, title: "", message: "삭제가 취소 되었습니다.", position: .top)
                     }
                 }
-#endif
+                toDoListViewModel.deleteToDoListID = nil
             }
         }
 
@@ -451,6 +456,8 @@ struct PostitListView: View {
         
         self.isDeleteAction = true
         self.isDeleteAlertShow.toggle()
+        
+        toDoListViewModel.deleteToDoListID = toDoListViewModel.toDoList[deleteIndex].id
         
         toDoListViewModel.deleteToDoList(toDoListViewModel.toDoList[deleteIndex], date, isOnlyWeekDayShow)
     }
