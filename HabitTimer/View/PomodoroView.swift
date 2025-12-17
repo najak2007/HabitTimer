@@ -685,6 +685,9 @@ struct PomodoroView: View {
         }
         
         if pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중 || pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
+#if DEBUG
+            print("self.timeRemaining: \(self.timeRemaining)")
+#endif
             TimeLiveActivityManager.shared.updateLiveActivity(remaingTime: Int(self.timeRemaining))
         }
     }

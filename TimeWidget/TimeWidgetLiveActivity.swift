@@ -25,7 +25,6 @@ struct TimeWidgetAttributes: ActivityAttributes {
 struct TimeWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TimeWidgetAttributes.self) { context in
-            // Lock screen/banner UI goes here
             VStack(spacing: 10) {
                 Text(context.attributes.title)
                     .font(.custom("GmarketSansTTFMedium", size: Config.LIVE_ACTIVITY_TITLE_FONT_SIZE))
@@ -50,8 +49,6 @@ struct TimeWidgetLiveActivity: Widget {
 
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
                 DynamicIslandExpandedRegion(.leading) {
                     Text((context.attributes.pomodoroState == .할일_진행중 || context.attributes.pomodoroState == .할일_일시정지) ? "집중" : "휴식")
                 }
