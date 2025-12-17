@@ -19,6 +19,8 @@ class ToDoListViewModel: ObservableObject {
     @Published var selectedIndex: Int = 0
     @Published var selectedToDoListData: ToDoListData = ToDoListData()
     
+    var deleteToDoListID: String?
+    
     init() {
         realm = RealmManager.shared.realm
         fetchToDoList()
@@ -122,7 +124,7 @@ class ToDoListViewModel: ObservableObject {
     }
     
     func deleteToDoListUndo(_ date: Date = Date(), _ isOnlyWeekDayShow: Bool = true, _ completionHandle: @escaping((Bool) -> Void)) {
-        guard let realm = realm else { return }
+        guard let realm = realm else { return completionHandle(false) }
         
         let toDoListData = realm.objects(ToDoListData.self).filter("isDeleteRequest == true")
         
@@ -156,23 +158,41 @@ class ToDoListViewModel: ObservableObject {
                 toDoListData.messageText = messageText
                 fetchToDoList(date, isOnlyWeekDayShow)
             }
-            
         } catch {
             
         }
     }
     
-    func updateToWeekDays(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, updateWeekDay: Int) {
+    func updateToWeekDays(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, updateWeekDay: Int, isDeleteRequest: Bool = false) {
         guard let realm = realm else { return }
         
         do {
             try realm.write {
                 toDoListData.setWeekDays = updateWeekDay
+                toDoListData.isDeleteRequest = isDeleteRequest
                 fetchToDoList(date, isOnlyWeekDayShow)
             }
         } catch {
             
         }
+    }
+    
+    func deleteToWeekDays(toDoListDataID: String, date: Date, isOnlyWeekDayShow: Bool = true)  {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        guard let updateToDoData = Array(results).filter({$0.id == toDoListDataID}).first else { return }
+        
+        let setWeekDays: Int = updateToDoData.setWeekDays ^ WeekDayValue.getWeekDayForDate(date)
+        
+        updateToWeekDays(toDoListData: updateToDoData, date: date, isOnlyWeekDayShow: isOnlyWeekDayShow, updateWeekDay: setWeekDays)
+    }
+    
+    func deleteToDoListData(toDoListDataID: String, date: Date, isOnlyWeekDayShow: Bool = true)  {
+        guard let realm = realm else { return }
+        let results = realm.objects(ToDoListData.self)
+        guard let deleteToDoData = Array(results).filter({$0.id == toDoListDataID}).first else { return }
+        
+        deleteToDoList(deleteToDoData, date, isOnlyWeekDayShow, false)
     }
     
     func updateToMinuteTime(toDoListData: ToDoListData, date: Date, isOnlyWeekDayShow: Bool = true, updateMinute: Int, isBreakTime: Bool = false) -> ToDoListData {
