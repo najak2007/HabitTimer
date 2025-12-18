@@ -13,6 +13,8 @@ struct TimeWidgetAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         // Dynamic stateful properties about your activity go here!
         var remaingTime: Int
+        var currentDate: Date
+        var remaingDate: Date
     }
 
     // Fixed non-changing properties about your activity go here!
@@ -25,7 +27,8 @@ struct TimeWidgetAttributes: ActivityAttributes {
 struct TimeWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TimeWidgetAttributes.self) { context in
-            VStack(spacing: 10) {
+            VStack(spacing: 5) {
+#if __NOT_USE__
                 Text(context.attributes.title)
                     .font(.custom("GmarketSansTTFMedium", size: Config.LIVE_ACTIVITY_TITLE_FONT_SIZE))
                     .foregroundColor(.black)
@@ -43,6 +46,25 @@ struct TimeWidgetLiveActivity: Widget {
                             .italic()
                     }
                 }
+#else
+                Text(context.attributes.title)
+                    .font(.custom("GmarketSansTTFMedium", size: Config.LIVE_ACTIVITY_TITLE_FONT_SIZE))
+                    .foregroundColor(.black)
+                
+                HStack {
+                    Text((context.attributes.pomodoroState == .할일_진행중 || context.attributes.pomodoroState == .할일_일시정지) ? "집중 시간" : "휴식 시간")
+                        .font(.custom("GmarketSansTTFMedium", size: Config.LIVE_ACTIVITY_POMODORO_FONT_SIZE))
+                        .foregroundColor(.black)
+                    
+                    Text(timerInterval: context.state.currentDate...context.state.remaingDate, countsDown: true)
+                        .font(.system(size: 24, weight: .semibold))
+                        .frame(width: 100)
+                        .lineLimit(1)
+                        .monospacedDigit()
+                        .foregroundColor(.black)
+                        .italic()
+                }
+#endif
             }
             .activityBackgroundTint(setBackgroundColor(for: context.attributes.backgroundIndex))
             .activitySystemActionForegroundColor(Color.black)
@@ -56,14 +78,19 @@ struct TimeWidgetLiveActivity: Widget {
                     Text((context.attributes.pomodoroState == .할일_진행중 || context.attributes.pomodoroState == .휴식_진행중) ? "진행중" : "일시정지" )
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("남은 시간: \(activityTimeConfiguration(for: context.state.remaingTime))")
+                    Text("남은 시간: \(timerInterval: context.state.currentDate...context.state.remaingDate, countsDown: true)")
+                        .frame(width: 150)
                 }
             } compactLeading: {
                 Text((context.attributes.pomodoroState == .할일_진행중 || context.attributes.pomodoroState == .할일_일시정지) ? "집중" : "휴식")
             } compactTrailing: {
-                Text(activityTimeConfiguration(for: context.state.remaingTime))
+                Text(timerInterval: context.state.currentDate...context.state.remaingDate, countsDown: true)
+                    .frame(width: 50)
+                    .lineLimit(1)
             } minimal: {
-                Text(activityTimeConfiguration(for: context.state.remaingTime))
+                Text(timerInterval: context.state.currentDate...context.state.remaingDate, countsDown: true)
+                    .frame(width: 50)
+                    .lineLimit(1)
             }
             .keylineTint(Color.red)
         }
@@ -96,12 +123,12 @@ extension TimeWidgetAttributes {
     }
 }
 
-extension TimeWidgetAttributes.ContentState {
-    fileprivate static var smiley: TimeWidgetAttributes.ContentState {
-        TimeWidgetAttributes.ContentState(remaingTime: 0)
-     }
-     
-     fileprivate static var starEyes: TimeWidgetAttributes.ContentState {
-         TimeWidgetAttributes.ContentState(remaingTime: 0)
-     }
-}
+//extension TimeWidgetAttributes.ContentState {
+//    fileprivate static var smiley: TimeWidgetAttributes.ContentState {
+//        TimeWidgetAttributes.ContentState(remaingTime: 0)
+//     }
+//     
+//     fileprivate static var starEyes: TimeWidgetAttributes.ContentState {
+//         TimeWidgetAttributes.ContentState(remaingTime: 0)
+//     }
+//}

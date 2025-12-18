@@ -12,6 +12,7 @@ import UIKit
 class TimerManager: ObservableObject {
     @Published var timeRemaining: Double = 0
     @Published var isPaused: Bool = true
+    @Published var isStart: Bool = false
     private var timer: Timer?
     private var midnightTimer: Timer?
     
@@ -28,6 +29,11 @@ class TimerManager: ObservableObject {
                     self.timeRemaining = 0
                 }
                 minutePassed.send(Int(self.timeRemaining))
+                
+                if isStart == false {
+                    activeLiveShowPassed.send(true)
+                }
+                isStart = true
             }
             isPaused = false
         }
@@ -37,7 +43,10 @@ class TimerManager: ObservableObject {
         timer?.invalidate()
         timer = nil
         isPaused = true
-
+        isStart = false
+        
+        activeLiveShowPassed.send(false)
+        
         UIApplication.shared.isIdleTimerDisabled = false
     }
     
@@ -51,6 +60,7 @@ class TimerManager: ObservableObject {
         timer?.invalidate()
         timer = nil
         isPaused = true
+        isStart = false
         
         UIApplication.shared.isIdleTimerDisabled = false
     }

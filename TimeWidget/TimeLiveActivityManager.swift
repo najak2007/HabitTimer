@@ -17,7 +17,7 @@ import ActivityKit
         self.activity = activity
     }
     
-    func onLiveActivity(activityTitle: String, backgroundIndex: Int, activityStatus: PomodoroState, remaingTime: Int, staleDate: Date? = nil) {
+    func onLiveActivity(activityTitle: String, backgroundIndex: Int, activityStatus: PomodoroState, remaingTime: Int, currentDate: Date = Date(), remaingDate: Date = Date()) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         
         let attributes = TimeWidgetAttributes(
@@ -26,8 +26,8 @@ import ActivityKit
             pomodoroState: activityStatus,
         )
         
-        let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
-        let content = ActivityContent(state: state, staleDate: staleDate, relevanceScore: 1.0)
+        let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime, currentDate: currentDate, remaingDate: remaingDate)
+        let content = ActivityContent(state: state, staleDate: remaingDate, relevanceScore: 1.0)
         
         do {
             self.activity = try Activity.request(attributes: attributes, content: content)
@@ -42,10 +42,10 @@ import ActivityKit
         }
     }
     
-    func updateLiveActivity(remaingTime: Int, staleDate: Date? = nil) {
+    func updateLiveActivity(remaingTime: Int, currentDate: Date = Date(), remaingDate: Date = Date()) {
 
-        let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime)
-        let newContent = ActivityContent(state: state, staleDate: staleDate, relevanceScore: 1.0)
+        let state = TimeWidgetAttributes.ContentState(remaingTime: remaingTime, currentDate: currentDate, remaingDate: remaingDate)
+        let newContent = ActivityContent(state: state, staleDate: remaingDate, relevanceScore: 1.0)
 #if __NOT_USE__
         Task {
             if remaingTime > 0 {

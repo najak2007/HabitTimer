@@ -317,6 +317,13 @@ struct PomodoroView: View {
             }
 #endif
         }
+        .onReceive(activeLiveShowPassed) { isStart in
+            if isStart {
+                let currentDate = Date()
+                TimeLiveActivityManager.shared.onLiveActivity(activityTitle: toDoListData.messageText, backgroundIndex: self.index, activityStatus: pomodoroState, remaingTime: Int(self.timeRemaining), currentDate: currentDate, remaingDate: toDoListViewModel.subtractSecondsFromDate(seconds: Int(self.timeRemaining), from: currentDate))
+
+            }
+        }
 #if __NOT_USE__
         .onReceive(secondTimer) { _ in
             let elapsedTime: Double = Date().timeIntervalSinceReferenceDate - startTime.timeIntervalSinceReferenceDate
@@ -453,10 +460,14 @@ struct PomodoroView: View {
                 timerManager.timeRemaining = 0
                 timerManager.resetTimer()
                 
-                nextToDoListConfiguration()
+                if pomodoroState == .할일_진행중 {
+                    pomodoroState = .할일_완료
+                } else if pomodoroState == .휴식_진행중 {
+                    pomodoroState = .휴식_완료
+                }
                 
+                nextToDoListConfiguration()
             }
-            getSecondTimeToMinuteTime()
         }
     }
     
@@ -550,6 +561,9 @@ struct PomodoroView: View {
             self.selectedMinute = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
             self.minuteValue = pomodoroState == .할일_완료 ? toDoListData.breakMinute : toDoListData.selectedMinute
             self.setStartAction()
+            
+            TimeLiveActivityManager.shared.offLiveActivity()
+            
             if self.isFullScreen == false {
                 DispatchQueue.main.async {
                     color = pomodoroState == .할일_완료 ? Color(hex: "0xE3EAA7") : getToDoPlayingForText()
@@ -643,9 +657,8 @@ struct PomodoroView: View {
             print("TimerManager timeRemaining = \(self.timeRemaining)")
 #endif
             if isResume == false {
+                timerManager.isStart = false
                 timerManager.startTimer()
-                TimeLiveActivityManager.shared.onLiveActivity(activityTitle: toDoListData.messageText, backgroundIndex: self.index, activityStatus: pomodoroState, remaingTime: Int(self.timeRemaining), staleDate: toDoListViewModel.subtractSecondsFromDate(seconds: Int(self.timeRemaining), from: Date()))
-                
             } else {
                 timerManager.resumeTimer()
                 TimeLiveActivityManager.shared.offLiveActivity()
@@ -684,11 +697,14 @@ struct PomodoroView: View {
             }
         }
         
+#if __NOT_USE__
         if pomodoroState == .할일_진행중 || pomodoroState == .휴식_진행중 || pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
-#if DEBUG
-            print("self.timeRemaining: \(self.timeRemaining)")
-#endif
             TimeLiveActivityManager.shared.updateLiveActivity(remaingTime: Int(self.timeRemaining))
         }
+#else
+        if pomodoroState == .할일_일시정지 || pomodoroState == .휴식_일시정지 {
+            TimeLiveActivityManager.shared.offLiveActivity()
+        }
+#endif
     }
 }
