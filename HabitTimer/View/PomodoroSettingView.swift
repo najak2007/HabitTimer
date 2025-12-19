@@ -172,8 +172,12 @@ struct PomodoroSettingView: View {
                                         DispatchQueue.main.async {
                                             toast = Toast(type: .info, title: "", message: "알림 권한 허용 필요 (설정 > 알림 허용)", position: .center)
                                         }
+                                    } else {
+                                        UserDefaults.standard.set(newValue, forKey: Config.NOTIFICATION_SETTING_ID)
                                     }
                                 }
+                            } else if oldValue == true, newValue == false {
+                                UserDefaults.standard.set(newValue, forKey: Config.NOTIFICATION_SETTING_ID)
                             }
                         }
                     }

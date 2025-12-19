@@ -20,7 +20,11 @@ class NotificationManager: NSObject {
             if let error = error {
                 print("Error requesting notification authorization: \(error)")
             } else {
-                UserDefaults.standard.set(granted, forKey: Config.NOTIFICATION_SETTING_ID)
+                let savedNotiValue = UserDefaults.standard.bool(forKey: Config.NOTIFICATION_SETTING_ID)
+                
+                if savedNotiValue == true, granted == false {
+                    UserDefaults.standard.set(granted, forKey: Config.NOTIFICATION_SETTING_ID)
+                }
             }
         }
     }
@@ -61,6 +65,11 @@ class NotificationManager: NSObject {
         if timeInterval == 0 {
             return
         }
+        
+        if UserDefaults.standard.bool(forKey: Config.NOTIFICATION_SETTING_ID) == false {
+            return
+        }
+        
         
         let content = UNMutableNotificationContent()
         content.title = title
