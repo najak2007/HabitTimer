@@ -87,15 +87,6 @@ struct PostitListView: View {
                                         .frame(width: 40, height: 40)
 #endif
 
-#if __NOT_USE__
-                                    TextWithBoldedSubstring(originalText: toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]), boldedSubstring: Date().weekDay)
-                                        .padding(.vertical, 5)
-                                        .padding(.horizontal, 8)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .stroke(Color.black.opacity(0.6), lineWidth: 1)
-                                        )
-#else
                                     Spacer()
                                     
                                     Text(toDoListViewModel.getToDoListForWeekDays(toDoListData: toDoListViewModel.toDoList[index]))
@@ -108,7 +99,6 @@ struct PostitListView: View {
                                             RoundedRectangle(cornerRadius: 16)
                                                 .stroke(Color.black.opacity(0.6), lineWidth: 0.8)
                                         )
-#endif
                                     Image(systemName: "list.bullet.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)
